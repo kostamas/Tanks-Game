@@ -29,6 +29,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
     int tankMoveDiff = 10;
     StackPane root;
     String[] directions = {"up", "up_right", "right", "down_right", "down", "down_left", "left", "up_left"};
+    int [][]bulletOffsetByDirection = {{10,0},{30,0},{37,11},{35,35},{10,35},{-5,35},{0,11},{0,0}};
 
     public static void main(String[] args) {
         String s1 = "consult('test1.pl')";
@@ -87,16 +88,16 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
         if (event.getCode() == KeyCode.SPACE) {
             int direction = tank1.getDirection();
-            int x = tank1.getCurrentPosition()[0];
-            int y = tank1.getCurrentPosition()[1];
+            int x = tank1.getCurrentPosition()[0] + bulletOffsetByDirection[direction][0];
+            int y = tank1.getCurrentPosition()[1] + bulletOffsetByDirection[direction][1];
             int nextX = 0, nextY = 0;
 
             if (direction != 0 && direction != 4) {
-                nextX += (direction == 1 || direction == 2 || direction == 3) ? 12 : -12;
+                nextX += (direction == 1 || direction == 2 || direction == 3) ? 10 : -10;
             }
 
             if (direction != 2 && direction != 6) {
-                nextY += (direction == 0 || direction == 1 || direction == 7) ? -12 : 12;
+                nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
             }
             tank1.shot(x, y, nextX, nextY, root);
         }

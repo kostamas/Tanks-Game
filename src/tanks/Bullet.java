@@ -18,11 +18,12 @@ public class Bullet extends Pane {
     String imgPath;
     int interval;
     int x, y, nextX, nextY;
+    final int animationDuration = 45;
     int count, cycleCount;
     Timeline timeline;
     StackPane root;  // the main pain 'injected' here because the shooting animation need the control to 
-                    // add/remove the bullet pane from the main pane.
-    
+    // add/remove the bullet pane from the main pane.
+
     public Bullet(String imgPath, int cycleCount, StackPane root) {
         this.cycleCount = cycleCount;
         this.imgPath = imgPath;
@@ -45,7 +46,7 @@ public class Bullet extends Pane {
         this.nextX = nextX;
         this.nextY = nextY;
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(45), keyFrameFn -> animate()));
+        timeline = new Timeline(new KeyFrame(Duration.millis(this.animationDuration), keyFrameFn -> animate()));
         timeline.setCycleCount(cycleCount);
 
         timeline.play();

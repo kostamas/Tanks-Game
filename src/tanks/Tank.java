@@ -78,6 +78,7 @@ public class Tank extends Pane {
 
     public void shot(int x, int y, int nextX, int nextY, StackPane root) {
         Bullet bullet = new Bullet("assets/green_bullet.png", 16, root);
+        
         bullet.fly(x, y, nextX, nextY, root);
     }
 }
