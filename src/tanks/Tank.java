@@ -11,6 +11,7 @@ import static javafx.application.ConditionalFeature.FXML;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 public class Tank extends Pane {
 
@@ -18,20 +19,30 @@ public class Tank extends Pane {
     int[] currentPosition;
     int currentDirection;
     int numOfDirections;
+    int tankLentgh;
     String[] imagesDirections;
     String imagesPrefixPath;
-    Bullet bullet;
 
-    Tank(int x, int y, int initilizedDirection, String initilizedImagePath, String[] imagesDirections, String imagesPrefixPath, Bullet bullet) {
+    Tank(int x, int y, int initilizedDirection, int tankLentgh, String initilizedImagePath, String[] imagesDirections, String imagesPrefixPath) {
         currentPosition = new int[2];
         setPosition(x, y, initilizedImagePath);
         this.currentDirection = initilizedDirection;
         this.imagesDirections = imagesDirections;
         this.imagesPrefixPath = imagesPrefixPath;
-        this.bullet = bullet;
+        this.tankLentgh = tankLentgh;
     }
 
     public void move(int x, int y, String imgPath) {
+        int [][]walls = Walls.walls;
+        int wallLength = Walls.length;
+        
+        for(int i = 0 ; i < walls.length; i++){
+            boolean XCollision = (x + this.tankLentgh >= walls[i][0] && x < walls[i][0] + wallLength);
+            boolean YCollision = (y + this.tankLentgh >= walls[i][1] && y < walls[i][1] + wallLength);
+            if(XCollision && YCollision){
+                return;
+            }
+        }
         setPosition(x, y, imgPath);
     }
 
@@ -65,7 +76,8 @@ public class Tank extends Pane {
         return this.currentPosition;
     }
 
-    public void shot(int x, int y, int nextX, int nextY) {
-        this.bullet.fly(x, y, nextX, nextY);
+    public void shot(int x, int y, int nextX, int nextY, StackPane root) {
+        Bullet bullet = new Bullet("assets/green_bullet.png", 16, root);
+        bullet.fly(x, y, nextX, nextY, root);
     }
 }

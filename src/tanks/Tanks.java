@@ -26,7 +26,8 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
     private Scene scene;
     private Tank tank1;
     private Tank tank2;
-    int tankMoveDiff = 25;
+    int tankMoveDiff = 10;
+    StackPane root;
     String[] directions = {"up", "up_right", "right", "down_right", "down", "down_left", "left", "up_left"};
 
     public static void main(String[] args) {
@@ -45,24 +46,21 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
     }
 
     public void start(Stage primaryStage) throws Exception {
-        StackPane root = new StackPane();
+        root = new StackPane();
 
         BackgroundImage myBI = new BackgroundImage(new Image("assets/background.png", 1300, 630, false, true),
                 BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
-        Bullet bullet1 = new Bullet("assets/green_bullet.png", 16);
-        Bullet bullet2 = new Bullet("assets/rey_bullet.png", 4);
-        tank1 = new Tank(0, 0, 4, "assets/tank1_down.png", this.directions, "assets/tank1_", bullet1);
-        tank2 = new Tank(1250, 550, 0, "assets/tank2_up.png", this.directions, "tank2", bullet2);
+        tank1 = new Tank(50, 50, 3, 30, "assets/tank1_down_right.png", this.directions, "assets/tank1_");
+        tank2 = new Tank(1200, 500, 0, 30, "assets/tank2_up_left.png", this.directions, "tank2");
 
         root.getChildren().add(tank1);
         root.getChildren().add(tank2);
 
-        root.getChildren().add(bullet1);
-        root.getChildren().add(bullet2);
-
+        Walls walls = new Walls(50, "assets/wall.png");
+        root.getChildren().add(walls);
         Scene scene = new Scene(root, 1300, 600);
         scene.setOnKeyPressed(this);
 
@@ -100,7 +98,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
             if (direction != 2 && direction != 6) {
                 nextY += (direction == 0 || direction == 1 || direction == 7) ? -12 : 12;
             }
-            tank1.shot(x, y, nextX, nextY);
+            tank1.shot(x, y, nextX, nextY, root);
         }
     }
 
