@@ -17,19 +17,22 @@ public class Bullet extends Pane {
     ImageView image;
     String imgPath;
     int interval;
-    int x, y, nextX, nextY;
+    int x, y, nextX, nextY, bulletLength;
     final int animationDuration = 45;
     int count, cycleCount;
     Timeline timeline;
+    Tank shootingTank;
     StackPane root;  // the main pain 'injected' here because the shooting animation need the control to 
     // add/remove the bullet pane from the main pane.
 
-    public Bullet(String imgPath, int cycleCount, StackPane root) {
+    public Bullet(String imgPath, Tank shootingTank, int cycleCount, StackPane root, int bulletLength) {
         this.cycleCount = cycleCount;
         this.imgPath = imgPath;
         this.count = 0;
         this.root = root;
+        this.bulletLength = bulletLength;
         root.getChildren().add(this);
+        this.shootingTank = shootingTank;
     }
 
     public void fly(int x, int y, int nextX, int nextY, StackPane root) {
@@ -57,14 +60,25 @@ public class Bullet extends Pane {
         getChildren().remove(image); // remove bullet image from the bullet pane.
         x += nextX;
         y += nextY;
-        System.out.println("X:" + getTranslateX() + "  Y:" + getTranslateY());
+
+        for (int i = 0; i < Walls.walls.length; i++) {
+            boolean XCollision = (x + this.bulletLength >= Walls.walls[i][0] && x < Walls.walls[i][0] + Walls.length);
+            boolean YCollision = (y + this.bulletLength >= Walls.walls[i][1] && y < Walls.walls[i][1] + Walls.length);
+            if (XCollision && YCollision) {
+                timeline.stop();
+                return null;
+
+            }
+        }
         setTranslateX(x);
         setTranslateY(y);
         image = new ImageView(new javafx.scene.image.Image(imgPath));
         getChildren().add(image);
-        if (count >= cycleCount) {
+        boolean wasHit = GameStatus.checkIfTankeHit(x, y, this.bulletLength, this.shootingTank);
+        if (count >= cycleCount || wasHit) {
+            timeline.stop();
             getChildren().remove(image);
-            root.getChildren().remove(this);  // remove
+            root.getChildren().remove(this);
             count = 0;
         }
         return null;

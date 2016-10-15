@@ -24,25 +24,14 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
     private TilePane tilePane;
     private Scene scene;
-    private Tank tank1;
-    private Tank tank2;
+    private Tank myTank;
+    private Tank computerTank;
     int tankMoveDiff = 10;
     StackPane root;
-    String[] directions = {"up", "up_right", "right", "down_right", "down", "down_left", "left", "up_left"};
-    int [][]bulletOffsetByDirection = {{10,0},{30,0},{37,11},{35,35},{10,35},{-5,35},{0,11},{0,0}};
+    int[][] bulletOffsetByDirection = {{10, 0}, {30, 0}, {37, 11}, {35, 35}, {10, 35}, {-5, 35}, {0, 11}, {0, 0}};
 
     public static void main(String[] args) {
-        String s1 = "consult('test1.pl')";
-        Query q1 = new Query(s1);
-        System.out.println(q1.hasSolution());
-        String s2 = "a(X)";
-        Query q2 = new Query(s2);
-        java.util.HashMap[] solution;
 
-        solution = (HashMap[]) q2.allSolutions();
-        for (java.util.HashMap sol : solution) {
-            System.out.println(sol);
-        }
         launch(args);
     }
 
@@ -54,11 +43,11 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
-        tank1 = new Tank(50, 50, 3, 30, "assets/tank1_down_right.png", this.directions, "assets/tank1_");
-        tank2 = new Tank(1200, 500, 0, 30, "assets/tank2_up_left.png", this.directions, "tank2");
+        myTank = new Tank(50, 50, 3, 30, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        computerTank = new Tank(1200, 500, 7, 30, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
 
-        root.getChildren().add(tank1);
-        root.getChildren().add(tank2);
+        root.getChildren().add(myTank);
+        root.getChildren().add(computerTank);
 
         Walls walls = new Walls(50, "assets/wall.png");
         root.getChildren().add(walls);
@@ -66,17 +55,21 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         scene.setOnKeyPressed(this);
 
         primaryStage.setScene(scene);
+        new GameStatus(myTank, computerTank, root);
+
         primaryStage.show();
+        Computer computer = new Computer(computerTank, myTank,root);
+
     }
 
     @Override
     public void handle(KeyEvent event) {
         this.tilePane = null;
         if (event.getCode() == KeyCode.RIGHT) {
-            tank1.turnRight();
+            myTank.turnRight();
         }
         if (event.getCode() == KeyCode.LEFT) {
-            tank1.turnLeft();
+            myTank.turnLeft();
         }
 
         if (event.getCode() == KeyCode.UP) {
@@ -87,9 +80,9 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         }
 
         if (event.getCode() == KeyCode.SPACE) {
-            int direction = tank1.getDirection();
-            int x = tank1.getCurrentPosition()[0] + bulletOffsetByDirection[direction][0];
-            int y = tank1.getCurrentPosition()[1] + bulletOffsetByDirection[direction][1];
+            int direction = myTank.getDirection();
+            int x = myTank.getCurrentPosition()[0] + bulletOffsetByDirection[direction][0];
+            int y = myTank.getCurrentPosition()[1] + bulletOffsetByDirection[direction][1];
             int nextX = 0, nextY = 0;
 
             if (direction != 0 && direction != 4) {
@@ -99,20 +92,20 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
             if (direction != 2 && direction != 6) {
                 nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
             }
-            tank1.shot(x, y, nextX, nextY, root);
+            myTank.shot(root, myTank);
         }
     }
 
     private void moveTank(String tankName, int tankMoveDiff) {
-        int x = tank1.getCurrentPosition()[0];
-        int y = tank1.getCurrentPosition()[1];
-        int direction = tank1.getDirection();
+        int x = myTank.getCurrentPosition()[0];
+        int y = myTank.getCurrentPosition()[1];
+        int direction = myTank.getDirection();
         if (direction != 0 && direction != 4) {
             x += (direction == 1 || direction == 2 || direction == 3) ? tankMoveDiff : -tankMoveDiff;
         }
         if (direction != 2 && direction != 6) {
             y += (direction == 0 || direction == 1 || direction == 7) ? -tankMoveDiff : tankMoveDiff;
         }
-        tank1.move(x, y, "assets/" + tankName + directions[direction] + ".png");
+        myTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + ".png");
     }
 }
