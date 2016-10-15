@@ -16,16 +16,15 @@ import javafx.scene.text.Text;
 
 public class GameStatus {
 
-    static Tank[] tanks = new Tank[2];
+    static Tank[] tanks;
     static Label textTank1;
     static Label textTank2;
     static StackPane root;
     static boolean gameFinished = false;
     static String[] directions = {"up", "up_right", "right", "down_right", "down", "down_left", "left", "up_left"};
 
-    public GameStatus(Tank tank1, Tank tank2, StackPane root) {
-        GameStatus.tanks[0] = tank1;
-        GameStatus.tanks[1] = tank2;
+    public GameStatus(Tank[] tanks, StackPane root) {
+        GameStatus.tanks = tanks;
         this.root = root;
         updateText();
     }
@@ -34,17 +33,17 @@ public class GameStatus {
         root.getChildren().remove(textTank1);
         root.getChildren().remove(textTank2);
 
-        textTank1 = new Label("YOUR TANK LIFE: " + GameStatus.tanks[0].getLife());
-        textTank2 = new Label("COMPUTER TANK LIFE: " + GameStatus.tanks[1].getLife());
+        textTank1 = new Label("YOUR TANKS LIFE: tank 1: " + GameStatus.tanks[0].getLife() + "    tank 2: " +GameStatus.tanks[1].getLife());
+        textTank2 = new Label("COMPUTER TANKs LIFE:  tank 1: " + GameStatus.tanks[2].getLife() + "       tank 2: " + GameStatus.tanks[3].getLife());
 
         textTank1.setTextFill(Color.web("#fbfbfb"));
         textTank1.setFont(new Font(20));
-        textTank1.setTranslateX(-510);
+        textTank1.setTranslateX(-450);
         textTank1.setTranslateY(-275);
 
         textTank2.setTextFill(Color.web("#fbfbfb"));
         textTank2.setFont(new Font(20));
-        textTank2.setTranslateX(480);
+        textTank2.setTranslateX(380);
         textTank2.setTranslateY(-275);
 
         root.getChildren().add(textTank1);
@@ -69,17 +68,22 @@ public class GameStatus {
         tank.hitted();
         updateText();
 
-        if (tank.getLife() == 0 && !gameFinished) {
-            showHowWon(tankId);
+        if (tanks[0].getLife() == 0 && tanks[1].getLife() == 0 &&!gameFinished) {
+            showHowWon(tanks[0].getTankName());
+            gameFinished = true;
+        }
+        
+          if (tanks[2].getLife() == 0 && tanks[3].getLife() == 0 &&!gameFinished) {
+            showHowWon(tanks[2].getTankName());
             gameFinished = true;
         }
     }
 
-    public static void showHowWon(int tankId) {
+    public static void showHowWon(String tankName) {
         ImageView image = new ImageView(new javafx.scene.image.Image("assets/fade_out.png"));
         root.getChildren().add(image);
-        String text = tankId == 0 ? "YOU LOSE!" : "YOU WIN!";
-        String color = tankId == 0 ? "#fb0000" : "#26e405";
+        String text = tankName.equals("Humen") ? "YOU LOSE!" : "YOU WIN!";
+        String color = tankName.equals("Humen") ? "#fb0000" : "#26e405";
         Label label = new Label(text);
 
         label.setTextFill(Color.web(color));

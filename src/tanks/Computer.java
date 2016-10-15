@@ -21,7 +21,7 @@ public class Computer {
     public Computer(Tank computerTank, Tank humenTank, StackPane root) {
         this.computerTank = computerTank;
         this.humenTank = humenTank;
-        String consult = "consult('tanks.pl')";
+        String consult = "consult('simple-heuristic.pl')";
         Query query = new Query(consult);
         query.hasSolution();
         startPlay();
