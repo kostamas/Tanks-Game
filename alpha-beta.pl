@@ -16,37 +16,66 @@ walls(Walls):-
             300-100, 300-150, 300-200, 300-2500,
             750-300, 750-350, 750-400, 750-450, 800-350, 850-350,
             900-200, 950-200, 1000-200, 1050-200, 1100-200].
+     ].
 
 
-next_moves(X-Y, [X-Y], DEPTH):-
-    DEPTH is 3,!.
+next_moves(X-Y,VISTED, VISTED, DEPTH):-
+ DEPTH = 4,!.
 
-next_moves(X-Y, _, _):-
+next_moves(X-Y,VISTED, MOVES, DEPTH):-
+    DEPTH1 is DEPTH + 1,
+    moves(X-Y,[],MOVES1,DEPTH1),
+    deep_moves(MOVES1,VISTED,MOVES,DEPTH1).
+
+
+moves(_,VISTED,VISTED,DEPTH):-
+    DEPTH = 5,!.
+
+moves(X-Y,VISTED,MOVES,_):-       /* eight possible moves*/
+	 X1 is X, Y1 is Y + 50,  add_to_moves(X1-Y1,VISTED,MOVES1),
+          X2 is X +50, Y2 is Y + 50, add_to_moves(X2-Y2,MOVES1,MOVES2),
+          X3 is X + 50, Y3 is Y, add_to_moves(X3-Y3,MOVES2,MOVES3),
+          X4 is X + 50, Y4 is Y -50, add_to_moves(X4-Y4,MOVES3,MOVES4),
+          X5 is X, Y5 is Y - 50, add_to_moves(X5-Y5,MOVES4,MOVES5),
+          X6 is X - 50, Y6 is Y - 50, add_to_moves(X6-Y6,MOVES5,MOVES6),
+          X7 is X - 50, Y7 is Y, add_to_moves(X7-Y7,MOVES6,MOVES7),
+          X8 is X - 50, Y8 is Y + 50 , add_to_moves(X8-Y8,MOVES7,MOVES).
+
+
+add_to_moves(X-Y,VISITED,MOVES):-
+    walls(Walls),
+    not(member(X-Y, Walls)),
+    not(member(X-Y, VISITED)),
+    X > 0, X < 1200,               /*game borders*/
+    Y> 0 , Y < 600,                 /*game borders*/
+    append([X-Y],VISITED,MOVES).
+
+add_to_moves(X-Y,VISITED,VISITED):-
+    member(X-Y, VISITED);
+    X =< 0 ; X >= 1200;              /*game borders*/
+    Y =< 0 ; Y >= 600;                 /*game borders*/
     walls(Walls), member(X-Y, Walls).
 
-next_moves(X-Y, MOVES, DEPTH):-
-    DEPTH < 3,
-    X1 is X, Y1 is Y + 50,          /* up */
-    X2 is X +50, Y2 is Y + 50,      /* up and right*/
-    X3 is X + 50, Y3 is Y,             /*right*/
-    X4 is X + 50, Y4 is Y -50,
-    X5 is X, Y5 is Y - 50,
-    X6 is X - 50, Y6 is Y - 50,
-    X7 is X - 50, Y7 is Y,
-    X8 is X - 50, Y8 is Y + 50,
-    DEPTH2 is DEPTH + 1,
-    next_moves(X1-Y1, MOVES1, DEPTH2),
-    next_moves(X2-Y2, MOVES2, DEPTH2),
-    next_moves(X3-Y3, MOVES3, DEPTH2),
-    next_moves(X4-Y4, MOVES4, DEPTH2),
-    next_moves(X5-Y5, MOVES5, DEPTH2),
-    next_moves(X6-Y6, MOVES6, DEPTH2),
-    next_moves(X7-Y7, MOVES7, DEPTH2),
-    next_moves(X8-Y8, MOVES8, DEPTH2),
-    append(MOVES1,MOVES2,RES1), append(MOVES3,MOVES4,RES2),
-    append(MOVES5,MOVES6,RES3), append(MOVES7,MOVES8,RES4),
-    append(RES1,RES2,R1), append(RES3,RES4,R2),
-    append(R1,R2,MOVES).
+deep_moves(Moves,Visited,Visited,Depth):-
+    Depth = 5,!.
+
+deep_moves([X-Y|MOVES],VISITED,NewMoves,DEPTH):-
+    add_to_visited(X-Y,VISITED,VISITED1),
+    next_moves(X-Y,VISITED1,MOVES1,DEPTH),
+    deep_moves(MOVES,MOVES1,NewMoves,DEPTH).
+
+deep_moves([],VISITED,VISITED,_).
+
+ add_to_visited(X-Y,VISITED,VISITED1):-
+        not(member(X-Y, VISITED)),
+        append([X-Y],VISITED,VISITED1).
+
+ add_to_visited(X-Y,VISITED,VISITED):-
+        member(X-Y, VISITED).
+
+
+
+
 
 
 

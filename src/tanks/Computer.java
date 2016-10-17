@@ -21,10 +21,15 @@ public class Computer {
     public Computer(Tank computerTank, Tank humenTank, StackPane root) {
         this.computerTank = computerTank;
         this.humenTank = humenTank;
-        String consult = "consult('simple-heuristic.pl')";
+        String consult = "consult('alpha-beta.pl')";
         Query query = new Query(consult);
         query.hasSolution();
-        startPlay();
+
+        Query query2 = new Query("next_moves(50-50,[50-50],MOVES,1).");
+        java.util.HashMap[] solution;
+        solution = (HashMap[]) query2.allSolutions();
+
+//        startPlay();
         this.root = root;
     }
 
@@ -120,7 +125,7 @@ public class Computer {
         shoot = ((Atom) solution[0].get("SHOOT")).name();
         if (shoot.equals("yes")) {
 
-        this.computerTank.shot(this.root, this.computerTank);
+            this.computerTank.shot(this.root, this.computerTank);
         }
         return nextMove;
     }
