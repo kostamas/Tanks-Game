@@ -15,70 +15,72 @@ walls(Walls):-
 
      ].
 
-moves(_,VISTED, VISTED, DEPTH):-
- DEPTH = 5,!.
+moves(_,VISTED, VISTED, DEPTH,_):-
+ DEPTH = 3,!.
 
 
-moves([CX-CY, HX-HY, PLAYER], PosList):-
+moves([_,_, _, MniMaxDepth], _):-
+    MniMaxDepth is 2,!,fail.
+
+moves([CX-CY, HX-HY, PLAYER, MniMaxDepth], PosList):-
    (PLAYER = computer, NextPlayer = humen
     ;
     PLAYER = humen, NextPlayer = computer),
-   VISITED = [[CX-CY, HX-HY, NextPlayer]],
-   moves([CX-CY, HX-HY, PLAYER], VISITED, PosList, 1).
+    MniMaxDepth2 is MniMaxDepth + 1,
+    VISITED = [[CX-CY, HX-HY, NextPlayer, MniMaxDepth2]],
+    moves([CX-CY, HX-HY, PLAYER, MniMaxDepth2], VISITED, PosList, 1).
 
 
-moves([CX-CY, HX-HY, PLAYER], VISTED, MOVES, DEPTH):-                            /* C-computer & H-humen */
+moves([CX-CY, HX-HY, PLAYER, MniMaxDepth], VISTED, MOVES, DEPTH):-                            /* C-computer & H-humen */
    (PLAYER = computer, X1 = CX, Y1 = CY, X2 = HX, Y2 = HY, NextPlayer = humen
     ;
     PLAYER = humen, X1 = HX, Y1 = HY, X2 = CX, Y2 = CY, NextPlayer = computer),
     DEPTH1 is DEPTH + 1,
-    eight_neighbors(X1-Y1, X2-Y2, NextPlayer, [], MOVES1, DEPTH1),           /* X1,Y1 - active player position, X2,Y2 - second player position*/
+    eight_neighbors(X1-Y1, X2-Y2, NextPlayer, [], MOVES1, DEPTH1, MniMaxDepth),           /* X1,Y1 - active player position, X2,Y2 - second player position*/
     deep_moves(MOVES1,VISTED,MOVES,DEPTH1).
 
 
 eight_neighbors(_,_,_,VISTED,VISTED,DEPTH):-
-    DEPTH = 5,!.
+    DEPTH = 3,!.
 
 
-eight_neighbors(X-Y, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED,MOVES,_):-       /* eight possible moves*/
-	  X1 is X, Y1 is Y + 50,  add_to_moves(X1-Y1, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED, MOVES1),
-          X2 is X +50, Y2 is Y + 50, add_to_moves(X2-Y2, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES1, MOVES2),
-          X3 is X + 50, Y3 is Y, add_to_moves(X3-Y3, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES2, MOVES3),
-          X4 is X + 50, Y4 is Y -50, add_to_moves(X4-Y4, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES3, MOVES4),
-          X5 is X, Y5 is Y - 50, add_to_moves(X5-Y5, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES4, MOVES5),
-          X6 is X - 50, Y6 is Y - 50, add_to_moves(X6-Y6, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES5, MOVES6),
-          X7 is X - 50, Y7 is Y, add_to_moves(X7-Y7, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES6, MOVES7),
-          X8 is X - 50, Y8 is Y + 50 , add_to_moves(X8-Y8, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES7, MOVES).
+eight_neighbors(X-Y, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED, MOVES, _, MniMaxDepth):-       /* eight possible moves*/
+	  X1 is X, Y1 is Y + 50,  add_to_moves(X1-Y1, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED, MOVES1, MniMaxDepth),
+          X2 is X +50, Y2 is Y + 50, add_to_moves(X2-Y2, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES1, MOVES2, MniMaxDepth),
+          X3 is X + 50, Y3 is Y, add_to_moves(X3-Y3, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES2, MOVES3, MniMaxDepth),
+          X4 is X + 50, Y4 is Y -50, add_to_moves(X4-Y4, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES3, MOVES4, MniMaxDepth),
+          X5 is X, Y5 is Y - 50, add_to_moves(X5-Y5, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES4, MOVES5, MniMaxDepth),
+          X6 is X - 50, Y6 is Y - 50, add_to_moves(X6-Y6, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES5, MOVES6, MniMaxDepth),
+          X7 is X - 50, Y7 is Y, add_to_moves(X7-Y7, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES6, MOVES7, MniMaxDepth),
+          X8 is X - 50, Y8 is Y + 50 , add_to_moves(X8-Y8, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES7, MOVES, MniMaxDepth).
 
 
-add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, MOVES):-
+add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, MOVES, MniMaxDepth):-
    (NextPlayer = humen, CX = CurrentPlayerX, CY = CurrentPlayerY, HX = NextPlayerX2, HY = NextPlayerY2
     ;
     NextPlayer = computer, CX = NextPlayerX2, CY = NextPlayerY2, HX = CurrentPlayerX, HY = CurrentPlayerY),
     walls(Walls),
     not(member(CurrentPlayerX-CurrentPlayerY, Walls)),
-    not(member([CX-CY,HX-HY,NextPlayer], VISITED)),
     CurrentPlayerX > 0, CurrentPlayerX < 1200,                                  /*game borders*/
     CurrentPlayerY> 0 , CurrentPlayerY < 600,                                   /*game borders*/
-    append([[CX-CY,HX-HY,NextPlayer]],VISITED,MOVES).
+    append([[CX-CY,HX-HY,NextPlayer,MniMaxDepth]],VISITED,MOVES).
 
 
-add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, VISITED):-
-    member(CurrentPlayerX-CurrentPlayerY, VISITED);
+add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, VISITED,_):-
     CurrentPlayerX =< 0 ; CurrentPlayerX >= 1200;                                 /*game borders*/
     CurrentPlayerY =< 0 ; CurrentPlayerY >= 600;                                  /*game borders*/
-    (walls(Walls), member(CurrentPlayerX-CurrentPlayerY, Walls)).
+   (walls(Walls), member(CurrentPlayerX-CurrentPlayerY, Walls)).
 
 
 deep_moves(_,Visited,Visited,Depth):-
-    Depth = 5,!.
+    Depth = 3,!.
 
-deep_moves([[CX-CY, HX-HY ,NextPlayer]| MOVES], VISITED, NewMoves,DEPTH):-
+deep_moves([[CX-CY, HX-HY ,NextPlayer, MniMaxDepth]| MOVES], VISITED, NewMoves, DEPTH):-
    (PLAYER = computer, X1 = CX, Y1 = CY, X2 = HX, Y2 = HY, NextPlayer = humen
     ;
     PLAYER = humen, X1 = HX, Y1 = HY, X2 = CX, Y2 = CY, NextPlayer = computer),
-    add_to_visited([CX-CY, HX-HY ,NextPlayer],VISITED,VISITED1),
-    moves([CX-CY, HX-HY ,PLAYER], VISITED1, MOVES1, DEPTH),
+    add_to_visited([CX-CY, HX-HY ,NextPlayer, MniMaxDepth],VISITED,VISITED1),
+    moves([CX-CY, HX-HY ,PLAYER, MniMaxDepth], VISITED1, MOVES1, DEPTH),
     deep_moves(MOVES,MOVES1,NewMoves,DEPTH).
 
 deep_moves([],VISITED,VISITED,_).
@@ -99,13 +101,13 @@ minimax(Pos,BestSucc,Val):-
     moves(Pos,PosList),!,
     best(PosList, BestSucc, Val)
     ;
-    staticval(PosList,BestSucc,Val).
+    staticval(Pos,Val).
 
 best([Pos], Pos, Val):-
     minimax(Pos,_,Val),!.
 
 best([Pos1|PosList],BestPos,BestVal):-
-    minimax(Pos1,_Val1),
+    minimax(Pos1,_,Val1),
     best(PosList,Pos2,Val2),
     betterof(Pos1,Val1,Pos2,Val2,BestPos,BestVal).
 
@@ -114,19 +116,34 @@ betterof(Pos0,Val0,Pos1,Val1,Pos0,Val0):-
     Val0 > Val1
     ;
     max_to_move(Pos0),
-    Val0<Val1,!.
+    Val0 < Val1,!.
 
 betterof(Pos0,Val0,Pos1,Val1,Pos1,Val1).
 
+
+min_to_move([_,_,PLAYER,_]):-
+    PLAYER = humen.
+ max_to_move([_,_,PLAYER,_]):-
+    PLAYER = computer.
 /* ------------------ minimax ------------------*/
 
 
 
+/*-------------------  heuristic function  --------------------*/
+
+staticval([CX-CY, HX-HY, PLAYER, MniMaxDepth],Val):-
+       manhattan_distance([CX,CY],[HX,HY],Distance),
+       Val is (-Distance).
 
 
+manhattan_distance([X1,Y1],[X2,Y2],RES):-
+    X is X1 - X2,
+    Y is Y1 - Y2,
+   abs(X,PX),abs(Y,PY),
+    RES is PX + PY.
 
 
-
+/*-------------------  heuristic function  --------------------*/
 
 
 
