@@ -23,7 +23,7 @@ moves([CX-CY, HX-HY, PLAYER], PosList):-
    (PLAYER = computer, NextPlayer = humen
     ;
     PLAYER = humen, NextPlayer = computer),
-   VISITED = [CX-CY, HX-HY, NextPlayer],
+   VISITED = [[CX-CY, HX-HY, NextPlayer]],
    moves([CX-CY, HX-HY, PLAYER], VISITED, PosList, 1).
 
 
@@ -58,29 +58,25 @@ add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlaye
     walls(Walls),
     not(member(CurrentPlayerX-CurrentPlayerY, Walls)),
     not(member([CX-CY,HX-HY,NextPlayer], VISITED)),
-    X > 0, X < 1200,                                  /*game borders*/
-    Y> 0 , Y < 600,                                   /*game borders*/
+    CurrentPlayerX > 0, CurrentPlayerX < 1200,                                  /*game borders*/
+    CurrentPlayerY> 0 , CurrentPlayerY < 600,                                   /*game borders*/
     append([[CX-CY,HX-HY,NextPlayer]],VISITED,MOVES).
 
 
 add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, VISITED):-
-   (NextPlayer = humen, CX = CurrentPlayerX, CY = CurrentPlayerY, HX = NextPlayerX2, HY = NextPlayerY2
-    ;
-    NextPlayer = computer, CX = NextPlayerX2, CY = NextPlayerY2, HX = CurrentPlayerX, HY = CurrentPlayerY),
     member(CurrentPlayerX-CurrentPlayerY, VISITED);
-    X =< 0 ; X >= 1200;                                 /*game borders*/
-    Y =< 0 ; Y >= 600;                                  /*game borders*/
+    CurrentPlayerX =< 0 ; CurrentPlayerX >= 1200;                                 /*game borders*/
+    CurrentPlayerY =< 0 ; CurrentPlayerY >= 600;                                  /*game borders*/
     (walls(Walls), member(CurrentPlayerX-CurrentPlayerY, Walls)).
-
 
 
 deep_moves(_,Visited,Visited,Depth):-
     Depth = 5,!.
 
-deep_moves([[CX-CY, HX-HY ,PLAYER]| MOVES], VISITED, NewMoves,DEPTH):-
-   (PLAYER = computer, NextPlayer = humen
+deep_moves([[CX-CY, HX-HY ,NextPlayer]| MOVES], VISITED, NewMoves,DEPTH):-
+   (PLAYER = computer, X1 = CX, Y1 = CY, X2 = HX, Y2 = HY, NextPlayer = humen
     ;
-    PLAYER = humen, NextPlayer = computer),
+    PLAYER = humen, X1 = HX, Y1 = HY, X2 = CX, Y2 = CY, NextPlayer = computer),
     add_to_visited([CX-CY, HX-HY ,NextPlayer],VISITED,VISITED1),
     moves([CX-CY, HX-HY ,PLAYER], VISITED1, MOVES1, DEPTH),
     deep_moves(MOVES,MOVES1,NewMoves,DEPTH).
@@ -89,7 +85,7 @@ deep_moves([],VISITED,VISITED,_).
 
  add_to_visited(Pos,VISITED,VISITED1):-
         not(member(Pos, VISITED)),
-        append(Pos,VISITED,VISITED1).
+        append([Pos],VISITED,VISITED1).
 
  add_to_visited(Pos,VISITED,VISITED):-
         member(Pos, VISITED).
