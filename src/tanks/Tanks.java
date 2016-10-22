@@ -26,7 +26,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
     private Scene scene;
     private Tank humenTank1, humenTank2;
     private Tank computerTank1, computerTank2;
-    int tankMoveDiff = 10;
+    GameController gameController;
     StackPane root;
     Tank humenActiveTank = humenTank2;
 
@@ -45,11 +45,11 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
-        humenTank1 = new Tank(50, 50, 3, 30, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-        humenTank2 = new Tank(50, 450, 3, 30, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTank1 = new Tank(50, 50, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTank2 = new Tank(50, 450, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
 
-        computerTank1 = new Tank(250, 50, 7, 30, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        computerTank2 = new Tank(1200, 50, 7, 30, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTank1 = new Tank(550, 50, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTank2 = new Tank(1200, 50, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
 
         root.getChildren().add(humenTank1);
         root.getChildren().add(humenTank2);
@@ -74,6 +74,8 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
         primaryStage.show();
         Computer computer = new Computer(computerTank1, humenTank1, root);
+        gameController = new GameController(scene, computer, this);
+        gameController.turnHanlder(0);
     }
 
     @Override
@@ -96,10 +98,14 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         }
 
         if (event.getCode() == KeyCode.UP) {
-            moveTank("tank1_", tankMoveDiff);
+            moveTank("tank1_", TankConst.tankMoveLength);
         }
         if (event.getCode() == KeyCode.DOWN) {
-            moveTank("tank1_", -tankMoveDiff);
+            moveTank("tank1_", -TankConst.tankMoveLength);
+        }
+        
+        if (event.getCode() == KeyCode.ENTER) {
+            gameController.turnHanlder(0);
         }
 
         if (event.getCode() == KeyCode.SPACE) {
