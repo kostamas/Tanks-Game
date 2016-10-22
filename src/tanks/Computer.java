@@ -21,13 +21,13 @@ public class Computer {
     public Computer(Tank computerTank, Tank humenTank, StackPane root) {
         this.computerTank = computerTank;
         this.humenTank = humenTank;
-        String consult = "consult('alpha-beta.pl')";
-        Query query = new Query(consult);
-        query.hasSolution();
-
-        Query query2 = new Query("next_moves(50-50,[50-50],MOVES,1).");
-        java.util.HashMap[] solution;
-        solution = (HashMap[]) query2.allSolutions();
+//        String consult = "consult('alpha-beta.pl')";
+//        Query query = new Query(consult);
+//        query.hasSolution();
+//
+//        Query query2 = new Query("next_moves(50-50,[50-50],MOVES,1).");
+//        java.util.HashMap[] solution;
+//        solution = (HashMap[]) query2.allSolutions();
 
 //        startPlay();
         this.root = root;

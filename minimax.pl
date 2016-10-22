@@ -15,12 +15,18 @@ walls(Walls):-
 
      ].
 
+shooting_area(Distance):-
+    Distance is 190.
+
+bad_val(BadVal):-
+    BadVal is 100000.
+
 moves(_,VISTED, VISTED, DEPTH,_):-
- DEPTH = 3,!.
+ DEPTH = 5,!.
 
 
 moves([_,_, _, MniMaxDepth], _):-
-    MniMaxDepth is 2,!,fail.
+    MniMaxDepth is 4,!,fail.
 
 moves([CX-CY, HX-HY, PLAYER, MniMaxDepth], PosList):-
    (PLAYER = computer, NextPlayer = humen
@@ -41,7 +47,7 @@ moves([CX-CY, HX-HY, PLAYER, MniMaxDepth], VISTED, MOVES, DEPTH):-              
 
 
 eight_neighbors(_,_,_,VISTED,VISTED,DEPTH):-
-    DEPTH = 3,!.
+    DEPTH = 5,!.
 
 
 eight_neighbors(X-Y, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED, MOVES, _, MniMaxDepth):-       /* eight possible moves*/
@@ -73,7 +79,7 @@ add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlaye
 
 
 deep_moves(_,Visited,Visited,Depth):-
-    Depth = 3,!.
+    Depth = 5,!.
 
 deep_moves([[CX-CY, HX-HY ,NextPlayer, MniMaxDepth]| MOVES], VISITED, NewMoves, DEPTH):-
    (PLAYER = computer, X1 = CX, Y1 = CY, X2 = HX, Y2 = HY, NextPlayer = humen
@@ -133,7 +139,12 @@ min_to_move([_,_,PLAYER,_]):-
 
 staticval([CX-CY, HX-HY, PLAYER, MniMaxDepth],Val):-
        manhattan_distance([CX,CY],[HX,HY],Distance),
-       Val is (-Distance).
+       shooting_area(ShootingDistance),
+       bad_val(BadVal),
+       (Distance =< ShootingDistance, Val is BadVal
+        ;
+         Val is (-Distance)
+        ).
 
 
 manhattan_distance([X1,Y1],[X2,Y2],RES):-
