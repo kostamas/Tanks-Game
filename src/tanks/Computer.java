@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import org.jpl7.Atom;
+import org.jpl7.Compound;
 import org.jpl7.Integer;
 import org.jpl7.Query;
 import org.jpl7.Term;
@@ -21,15 +22,11 @@ public class Computer {
     public Computer(Tank computerTank, Tank humenTank, StackPane root) {
         this.computerTank = computerTank;
         this.humenTank = humenTank;
-//        String consult = "consult('alpha-beta.pl')";
-//        Query query = new Query(consult);
-//        query.hasSolution();
-//
-//        Query query2 = new Query("next_moves(50-50,[50-50],MOVES,1).");
-//        java.util.HashMap[] solution;
-//        solution = (HashMap[]) query2.allSolutions();
-
-//        startPlay();
+        String consult = "consult('alpha-beta.pl')";
+        Query query = new Query(consult);
+        query.hasSolution();
+        
+        startPlay();
         this.root = root;
     }
 
@@ -111,17 +108,26 @@ public class Computer {
         }
     }
 
-    private int[] askForNextMove(int x, int y) {
-        String moves = buildMovesForProlog();
-        String bestMove = "best_move(" + moves + "," + x + "-" + y + ",X-Y, SHOOT).";
-        Query q3 = new Query(bestMove);
-        java.util.HashMap[] solution;
-        solution = (HashMap[]) q3.allSolutions();
+    private int[] askForNextMove(int humenX, int humenY) {
+       
+        int computerX = computerTank.getCurrentPosition()[0];
+        int computerY = computerTank.getCurrentPosition()[1];
+        
+        String alphabetaPos = "[" + computerX + "-" + computerY + "," +  humenX + "-" + humenY + ", computer, 1]";
+        String bestMoveQuery = "[ComputerX-ComputerY,_,_,_]";
+        String alphabetaQuery = "alphabeta(" + alphabetaPos + ",100000, -100000," + bestMoveQuery + ", Val).";
+        Query bestMove = new Query(alphabetaQuery);
 
+        java.util.HashMap[] solution;
+        solution = (HashMap[]) bestMove.allSolutions();
+
+        
         int[] nextMove = new int[2];
         String shoot;
-        nextMove[0] = ((org.jpl7.Integer) solution[0].get("X")).intValue();
-        nextMove[1] = ((org.jpl7.Integer) solution[0].get("Y")).intValue();
+        nextMove[0] =  ((org.jpl7.Integer) solution[0].get("ComputerX")).intValue();
+        nextMove[1] =  ((org.jpl7.Integer) solution[0].get("ComputerY")).intValue();
+//        nextMove[0] = ((org.jpl7.Integer) solution[0].get("X")).intValue();
+//        nextMove[1] = ((org.jpl7.Integer) solution[0].get("Y")).intValue();
         shoot = ((Atom) solution[0].get("SHOOT")).name();
         if (shoot.equals("yes")) {
 
@@ -130,24 +136,7 @@ public class Computer {
         return nextMove;
     }
 
-    private String buildMovesForProlog() {
-        String moves = "";
-        int x = computerTank.getCurrentPosition()[0];
-        int y = computerTank.getCurrentPosition()[1];
 
-        moves += x + "-" + y;
-        moves += isCollision(x, y + 10) ? "" : "," + (x) + "-" + (y + 10);
-        moves += isCollision(x + 10, y + 10) ? "" : "," + (x + 10) + "-" + (y + 10);
-        moves += isCollision(x + 10, y) ? "" : "," + (x + 10) + "-" + (y);
-        moves += isCollision(x + 10, y - 10) ? "" : "," + (x + 10) + "-" + (y - 10);
-        moves += isCollision(x, y - 10) ? "" : "," + x + "-" + (y - 10);
-        moves += isCollision(x - 10, y - 10) ? "" : "," + (x - 10) + "-" + (y - 10);
-        moves += isCollision(x - 10, y) ? "" : "," + (x - 10) + "-" + y;
-        moves += isCollision(x - 10, y + 10) ? "" : "," + (x - 10) + "-" + (y + 10);
-
-        moves = "[" + moves + "]";
-        return moves;
-    }
 
     private boolean isCollision(int x, int y) {
         int[][] walls = Walls.walls;
