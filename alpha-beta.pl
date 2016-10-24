@@ -190,7 +190,7 @@ staticval([CX-CY, HX-HY, PLAYER, MniMaxDepth],Val):-
        Val1 is -Distance + 100 , Distance + TankMoveLength*2 =< ShootingDistance /* enter to the shooting area*/
        ;
        Val1 is (-Distance)),
-      (Val2 is 100, (CX = HX, CY = HY ;(abs(CX - HX, R1), abs(CY- HY, R2), abs(R1 - R2, R3), R3 < 40) )   /* check if the tank is in a shooting line*/
+      (Val2 is 100, abs(CX - HX, R1), abs(CY- HY, R2), abs(R1 - R2, R3), (R1 < 20 ; R2 < 20 ;R3 < 40 )   /* check if the tank is in a shooting line*/
        ;
        Val2 is 0),
        Val is Val1 + Val2.

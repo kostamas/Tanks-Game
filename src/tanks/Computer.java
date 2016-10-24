@@ -151,6 +151,7 @@ public class Computer {
 
     private KeyFrame animate(List<int[]> path) {
         if (path.size() == 0) {
+            setCorrectDirection();
             shootingHandler();
             timeline.stop();
             return null;
@@ -209,6 +210,43 @@ public class Computer {
         return false;
     }
 
+    private void setCorrectDirection() {
+        int cx = this.computerTank.getCurrentPosition()[0];
+        int cy = this.computerTank.getCurrentPosition()[1];
+        int hx = this.humenTank.getCurrentPosition()[0];
+        int hy = this.humenTank.getCurrentPosition()[1];
+        int nextDirection = -1;
+        String yDirection = "";
+        String xDirection = "";
+        String direction = "";
+
+        if (Math.abs(hy - cy) > 30) {
+            yDirection = hy - cy < 0 ? "up" : "down";
+        }
+
+        if (Math.abs(hx - cx) > 30) {
+            xDirection = hx - cx > 0 ? "right" : "left";
+        }
+
+        if (yDirection.length() > 0 && xDirection.length() > 0) {
+            direction = yDirection + "_" + xDirection;
+        } else {
+            direction = yDirection + xDirection;
+        }
+
+        for (int i = 0; i < TankConst.directions.length; i++) {
+            if (TankConst.directions[i].equals(direction)) {
+                nextDirection = i;
+            }
+        }
+
+        if (this.computerTank.getDirection() != nextDirection) {
+            calcTurn(this.computerTank.getDirection(), nextDirection);
+            setCorrectDirection();
+        }
+
+    }
+
     private void shootingHandler() {
         int cx = this.computerTank.getCurrentPosition()[0];
         int cy = this.computerTank.getCurrentPosition()[1];
@@ -221,7 +259,7 @@ public class Computer {
             return;
         }
 
-        if (cx == hy || cy == hy || Math.abs(Math.abs(cx - hx) - Math.abs(cy - hy)) < 20) {
+        if ( Math.abs(cx - hx) < 20 || Math.abs(cy - hy) < 20 || Math.abs(Math.abs(cx - hx) - Math.abs(cy - hy)) < 20) {
             this.computerTank.shot(root, this.computerTank);
         }
     }
