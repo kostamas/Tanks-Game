@@ -19,7 +19,7 @@ import javafx.util.Duration;
 public class Tank extends Pane {
 
     ImageView image, hitImage;
-    int life = 5;
+    int life = TankConst.TANK_LIFE;
     int[] currentPosition;
     int currentDirection;
     int numOfDirections;
@@ -27,16 +27,48 @@ public class Tank extends Pane {
     String tankName;
     String[] imagesDirections;
     String imagesPrefixPath;
-    int[][] bulletOffsetByDirection = {{10, 0}, {30, 0}, {37, 11}, {35, 35}, {10, 35}, {-5, 35}, {0, 11}, {0, 0}};
+    int[] startPosition;
 
     Tank(int x, int y, int initilizedDirection, int tankLentgh, String initilizedImagePath, String[] imagesDirections, String imagesPrefixPath, String tankName) {
         currentPosition = new int[2];
+        startPosition = new int[2];
+        startPosition[0] = x;
+        startPosition[1] = y;
         setPosition(x, y, initilizedImagePath);
         this.currentDirection = initilizedDirection;
         this.imagesDirections = imagesDirections;
         this.imagesPrefixPath = imagesPrefixPath;
         this.tankLentgh = tankLentgh;
         this.tankName = tankName;
+    }
+
+    public int[] getCurrentPosition() {
+        return this.currentPosition;
+    }
+
+    public String getTankName() {
+        return this.tankName;
+    }
+
+    public int[] getStartedPosition() {
+        return this.startPosition;
+    }
+
+    public void setStartedPostion(int x, int y) {
+        startPosition[0] = x;
+        startPosition[1] = y;
+    }
+
+    int getDirection() {
+        return this.currentDirection;
+    }
+
+    public int getTankLength() {
+        return this.tankLentgh;
+    }
+
+    public int getLife() {
+        return this.life;
     }
 
     public void move(int x, int y, String imgPath) {
@@ -65,10 +97,6 @@ public class Tank extends Pane {
         setPosition(this.currentPosition[0], this.currentPosition[1], nextImage);
     }
 
-    int getDirection() {
-        return this.currentDirection;
-    }
-
     public void setPosition(int x, int y, String imgPath) {
         getChildren().remove(image);
         image = new ImageView(new javafx.scene.image.Image(imgPath));
@@ -79,18 +107,10 @@ public class Tank extends Pane {
         this.currentPosition[1] = y;
     }
 
-    public int[] getCurrentPosition() {
-        return this.currentPosition;
-    }
-    
-    public String getTankName() {
-        return this.tankName;
-    }
-
     public void shot(StackPane root, Tank shootingTank) {
         int direction = shootingTank.getDirection();
-        int x = shootingTank.getCurrentPosition()[0] + bulletOffsetByDirection[direction][0];
-        int y = shootingTank.getCurrentPosition()[1] + bulletOffsetByDirection[direction][1];
+        int x = shootingTank.getCurrentPosition()[0] + TankConst.bulletOffsetByDirection[direction][0];
+        int y = shootingTank.getCurrentPosition()[1] + TankConst.bulletOffsetByDirection[direction][1];
         int nextX = 0, nextY = 0;
 
         if (direction != 0 && direction != 4) {
@@ -100,20 +120,12 @@ public class Tank extends Pane {
         if (direction != 2 && direction != 6) {
             nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
         }
-        Bullet bullet = new Bullet("assets/green_bullet.png",this, 16, root, 10);
+        Bullet bullet = new Bullet("assets/green_bullet.png", this, 16, root, 10);
         bullet.fly(x, y, nextX, nextY, root);
-    }
-
-    public int getLife() {
-        return this.life;
     }
 
     public void updateLife(int newLife) {
         this.life = newLife;
-    }
-
-    public int getTankLength() {
-        return this.tankLentgh;
     }
 
     public void hitted() {

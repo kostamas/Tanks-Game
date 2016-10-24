@@ -154,6 +154,7 @@ public class Computer {
             setCorrectDirection();
             shootingHandler();
             timeline.stop();
+            GameController.setActivePlayer(TankConst.HUMEN);
             return null;
         }
         int[] nextMove = path.remove(0);

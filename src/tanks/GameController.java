@@ -8,24 +8,27 @@ public class GameController {
 
     private Scene mainScene;
     private Computer computer;
-    private EventHandler<? super KeyEvent> humenEventHandler;
-    
-    private final int COMPUTER_TURN = 0;
-    private final int HUMEN_TURN = 0;
+    private static int ACTIVE_PLAYER;
 
-    public GameController(Scene mainScene, Computer computer,EventHandler<? super KeyEvent> humenEventHandler) {
+    public GameController(Scene mainScene, Computer computer) {
         this.mainScene = mainScene;
         this.computer = computer;
-        this.humenEventHandler = humenEventHandler;
+    }
+
+    public static void setActivePlayer(int activePlayer) {
+        ACTIVE_PLAYER = activePlayer;
+    }
+    
+    public static int getActivePlayer(){
+        return ACTIVE_PLAYER;
     }
 
     public void turnHanlder(int turn) {
-        if (turn == COMPUTER_TURN) {
+        if (turn == TankConst.COMPUTER) {
+            setActivePlayer(TankConst.COMPUTER);
             computer.play();
-            this.turnHanlder(1);
         } else {
-            mainScene.setOnKeyPressed((EventHandler<? super KeyEvent>) humenEventHandler);
+            setActivePlayer(TankConst.HUMEN);
         }
     }
-
 }

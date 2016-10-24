@@ -32,7 +32,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
     private Tank computerTank1, computerTank2;
     GameController gameController;
     StackPane root;
-    Tank humenActiveTank = humenTank2;
+    Humen humen;
 
     public static void main(String[] args) {
 
@@ -72,94 +72,41 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         tanks[3] = computerTank2;
 
         new GameStatus(tanks, root);
-        humenActiveTank = humenTank1;
-        
-          Canvas canvas = new Canvas(1300, 600);
+
+        Canvas canvas = new Canvas(1300, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawShapes(gc);
         root.getChildren().add(canvas);
 
         primaryStage.show();
         Computer computer = new Computer(computerTank1, humenTank1, root);
-        gameController = new GameController(scene, computer, this);
+        gameController = new GameController(scene, computer);
+        humen = new Humen(humenTank1, humenTank1, humenTank2, root, gameController);
+
         gameController.turnHanlder(0);
     }
 
     @Override
     public void handle(KeyEvent event) {
         this.tilePane = null;
-
-        if (event.getCode() == KeyCode.DIGIT1) {
-            humenActiveTank = humenTank1;
-        }
-
-        if (event.getCode() == KeyCode.DIGIT2) {
-            humenActiveTank = humenTank2;
-        }
-
-        if (event.getCode() == KeyCode.RIGHT) {
-            humenActiveTank.turnRight();
-        }
-        if (event.getCode() == KeyCode.LEFT) {
-            humenActiveTank.turnLeft();
-        }
-
-        if (event.getCode() == KeyCode.UP) {
-            moveTank("tank1_", TankConst.tankMoveLength);
-        }
-        if (event.getCode() == KeyCode.DOWN) {
-            moveTank("tank1_", -TankConst.tankMoveLength);
-        }
-        
-        if (event.getCode() == KeyCode.ENTER) {
-            gameController.turnHanlder(0);
-        }
-
-        if (event.getCode() == KeyCode.SPACE) {
-            int direction = humenActiveTank.getDirection();
-            int x = humenActiveTank.getCurrentPosition()[0] + TankConst.bulletOffsetByDirection[direction][0];
-            int y = humenActiveTank.getCurrentPosition()[1] + TankConst.bulletOffsetByDirection[direction][1];
-            int nextX = 0, nextY = 0;
-
-            if (direction != 0 && direction != 4) {
-                nextX += (direction == 1 || direction == 2 || direction == 3) ? 10 : -10;
-            }
-
-            if (direction != 2 && direction != 6) {
-                nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
-            }
-            humenActiveTank.shot(root, humenActiveTank);
-        }
-    }
-
-    private void moveTank(String tankName, int tankMoveDiff) {
-        int x = humenActiveTank.getCurrentPosition()[0];
-        int y = humenActiveTank.getCurrentPosition()[1];
-        int direction = humenActiveTank.getDirection();
-        if (direction != 0 && direction != 4) {
-            x += (direction == 1 || direction == 2 || direction == 3) ? tankMoveDiff : -tankMoveDiff;
-        }
-        if (direction != 2 && direction != 6) {
-            y += (direction == 0 || direction == 1 || direction == 7) ? -tankMoveDiff : tankMoveDiff;
-        }
-        humenActiveTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + ".png");
+        humen.eventHanlder(event);
     }
     
-     private void drawShapes(GraphicsContext gc) {
+    private void drawShapes(GraphicsContext gc) {
         gc.setLineWidth(0.3);
 
         // vertical lines
         gc.setStroke(Color.BLUE);
-        for(int x = 50 ; x < 1300 ; x+=50){
+        for (int x = 50; x < 1300; x += 50) {
             gc.strokeLine(x, 50, x, 550);
-        }        
+        }
 
         //  horizontal lines
         gc.setStroke(Color.RED);
-        for(int y = 50 ; y < 700 ; y+=50){
+        for (int y = 50; y < 700; y += 50) {
             gc.strokeLine(50, y, 1250, y);
-        }        
-        
+        }
+
     }
 
 }
