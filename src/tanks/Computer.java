@@ -119,11 +119,6 @@ public class Computer {
         String shoot;
         nextMove[0] = ((org.jpl7.Integer) solution.get("ComputerX")).intValue();
         nextMove[1] = ((org.jpl7.Integer) solution.get("ComputerY")).intValue();
-//        shoot = ((Atom) solution[0].get("SHOOT")).name();
-//        if (shoot.equals("yes")) {
-//
-//            this.computerTank.shot(this.root, this.computerTank);
-//        }
         return nextMove;
     }
 
@@ -150,7 +145,7 @@ public class Computer {
         int currentY = computerTank.getCurrentPosition()[1];
         List<int[]> result = findPath(target, currentX, currentY, path, 1);
         timeline = new Timeline(new KeyFrame(Duration.millis(250), keyFrameFn -> animate(result)));
-        timeline.setCycleCount(Timeline.INDEFINITE);  // infinite- beacause need to run shootingHandler.
+        timeline.setCycleCount(result.size() + 1);  // size + 1: beacause need to run shootingHandler.
         timeline.play();
     }
 

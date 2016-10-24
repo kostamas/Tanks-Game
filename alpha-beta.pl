@@ -183,12 +183,14 @@ staticval([CX-CY, HX-HY, PLAYER, MniMaxDepth],Val):-
        shooting_area(ShootingDistance),
        bad_val(BadVal),
        tank_move_length(TankMoveLength),
-      (Val1 is BadVal, Distance =< ShootingDistance + TankMoveLength*3,  Distance > ShootingDistance 
+      (Val1 is BadVal, Distance < TankMoveLength*4   /* too much close*/
        ;
-       Distance + TankMoveLength*3 =< ShootingDistance, Val1 is -Distance + 100 
+       Val1 is BadVal, Distance =< ShootingDistance + TankMoveLength*4,  Distance > ShootingDistance      /* give the opponent the option to enter to the shooting area first */
+       ;
+       Val1 is -Distance + 100 , Distance + TankMoveLength*2 =< ShootingDistance /* enter to the shooting area*/
        ;
        Val1 is (-Distance)),
-      (Val2 is 100, (CX = HX ; CY = HY ; (abs(CX - HX, R1), abs(CY- HY, R2), R1 = R2) )   /* check if the tank is in a shooting line*/
+      (Val2 is 100, (CX = HX, CY = HY ;(abs(CX - HX, R1), abs(CY- HY, R2), abs(R1 - R2, R3), R3 < 40) )   /* check if the tank is in a shooting line*/
        ;
        Val2 is 0),
        Val is Val1 + Val2.
