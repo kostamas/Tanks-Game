@@ -6,6 +6,8 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,6 +20,8 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
 public class Tanks extends Application implements EventHandler<KeyEvent> {
@@ -29,8 +33,6 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
     GameController gameController;
     StackPane root;
     Tank humenActiveTank = humenTank2;
-
-    int[][] bulletOffsetByDirection = {{10, 0}, {30, 0}, {37, 11}, {35, 35}, {10, 35}, {-5, 35}, {0, 11}, {0, 0}};
 
     public static void main(String[] args) {
 
@@ -71,6 +73,11 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
         new GameStatus(tanks, root);
         humenActiveTank = humenTank1;
+        
+          Canvas canvas = new Canvas(1300, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        drawShapes(gc);
+        root.getChildren().add(canvas);
 
         primaryStage.show();
         Computer computer = new Computer(computerTank1, humenTank1, root);
@@ -110,8 +117,8 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
         if (event.getCode() == KeyCode.SPACE) {
             int direction = humenActiveTank.getDirection();
-            int x = humenActiveTank.getCurrentPosition()[0] + bulletOffsetByDirection[direction][0];
-            int y = humenActiveTank.getCurrentPosition()[1] + bulletOffsetByDirection[direction][1];
+            int x = humenActiveTank.getCurrentPosition()[0] + TankConst.bulletOffsetByDirection[direction][0];
+            int y = humenActiveTank.getCurrentPosition()[1] + TankConst.bulletOffsetByDirection[direction][1];
             int nextX = 0, nextY = 0;
 
             if (direction != 0 && direction != 4) {
@@ -137,4 +144,22 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         }
         humenActiveTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + ".png");
     }
+    
+     private void drawShapes(GraphicsContext gc) {
+        gc.setLineWidth(0.3);
+
+        // vertical lines
+        gc.setStroke(Color.BLUE);
+        for(int x = 50 ; x < 1300 ; x+=50){
+            gc.strokeLine(x, 50, x, 550);
+        }        
+
+        //  horizontal lines
+        gc.setStroke(Color.RED);
+        for(int y = 50 ; y < 700 ; y+=50){
+            gc.strokeLine(50, y, 1250, y);
+        }        
+        
+    }
+
 }
