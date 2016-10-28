@@ -10,79 +10,120 @@ walls(Walls):-
 
             50-0, 100-0, 150-0, 200-0, 250-0, 300-0, 350-0, 400-0, 450-0,                                /*top wall*/
             500-0, 500-0, 550-0, 600-0, 650-0, 700-0, 750-0, 800-0, 850-0,
-            900-0, 950-0, 1000-0, 1050-0, 1100-0, 1150-0, 1200-0, 1250-0,
+            900-0, 950-0, 1000-0, 1050-0, 1100-0, 1150-0, 1200-0, 1250-0
 
-
-            200-450, 250-450, 300-450, 350-450,                                                  /*inner walls*/
-            300-100, 300-150, 300-200, 300-2500,
-            750-300, 750-350, 750-400, 750-450, 800-350, 850-350,
-            900-200, 950-200, 1000-200, 1050-200, 1100-200
      ].
 
 /* ------------ const values  --------------- */
 
 shooting_area(Distance):-
-    Distance is 190.
+    Distance is 90.
 
 tank_move_length(Length):-
     Length is 50.
 
 bad_val(BadVal):-
-    BadVal is -100000.
+    BadVal is -10000.
 
+
+alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
+    Depth is 2.
 
 /* ------------ const values  --------------- */
 
-moves(_,VISTED, VISTED, DEPTH,_):-
- DEPTH = 5,!.
+
+moves([_,_, _, AlphaBetaDepth], _):-
+    alpha_beta_depth(Depth),
+    AlphaBetaDepth == Depth,!,fail.
+
+moves([CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
+    AlphaBetaDepth2 is AlphaBetaDepth + 1,
+    (
+       PLAYER = computer, next_moves(CTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList) ; 
+       PLAYER = humen, next_moves(HTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList)
+    ).
 
 
-moves([_,_, _, MniMaxDepth], _):-
-    MniMaxDepth is 2,!,fail.
-
-moves([CX-CY, HX-HY, PLAYER, MniMaxDepth], PosList):-
-   (PLAYER = computer, NextPlayer = humen
-    ;
-    PLAYER = humen, NextPlayer = computer),
-    MniMaxDepth2 is MniMaxDepth + 1,
-    VISITED = [[CX-CY, HX-HY, NextPlayer, MniMaxDepth2]],
-    moves([CX-CY, HX-HY, PLAYER, MniMaxDepth2], VISITED, PosList1, 1),
-    delete(PosList1, [CX-CY, HX-HY, NextPlayer, MniMaxDepth2], PosList).
+next_moves([[X,Y,L,Num]|Tanks], Pos, PosList):-
+    tank_moves([X,Y,L,Num], Pos,PosList1),
+    next_moves(Tanks,Pos, PosList2),
+    append(PosList1, PosList2, PosList).
 
 
-moves([CX-CY, HX-HY, PLAYER, MniMaxDepth], VISTED, MOVES, DEPTH):-                            /* C-computer & H-humen */
-   (PLAYER = computer, X1 = CX, Y1 = CY, X2 = HX, Y2 = HY, NextPlayer = humen
-    ;
-    PLAYER = humen, X1 = HX, Y1 = HY, X2 = CX, Y2 = CY, NextPlayer = computer),
-    DEPTH1 is DEPTH + 1,
-    eight_neighbors(X1-Y1, X2-Y2, NextPlayer, [], MOVES1, DEPTH1, MniMaxDepth),           /* X1,Y1 - active player position, X2,Y2 - second player position*/
-    deep_moves(MOVES1,VISTED,MOVES,DEPTH1).
+next_moves([],_,[]).
 
 
-eight_neighbors(_,_,_,VISTED,VISTED,DEPTH):-
-    DEPTH = 5,!.
+tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
+     PLAYER = computer,
+     X1 is X - 50, Y1 is Y,      add_to_pos_list([X1,Y1,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1),
+     X2 is X - 50, Y2 is Y - 50, add_to_pos_list([X2,Y2,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2),
+     X3 is X - 50, Y3 is Y + 50, add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3),
+     X4 is X , Y4 is Y + 50,     add_to_pos_list([X4,Y4,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList4),
+     X5 is X , Y5 is Y - 50,     add_to_pos_list([X5,Y5,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList4, PosList).
 
+tank_moves([X,Y,L,Num] [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
+     PLAYER = humen,
+     X1 is X + 50, Y1 is Y,      add_to_pos_list([X1,Y1,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1),
+     X2 is X + 50, Y2 is Y - 50, add_to_pos_list([X2,Y2,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2),
+     X3 is X + 50, Y3 is Y + 50, add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3),
+     X4 is X , Y4 is Y + 50,     add_to_pos_list([X4,Y4,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList4),
+     X5 is X , Y5 is Y - 50,     add_to_pos_list([X5,Y5,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList4, PosList).
 
-eight_neighbors(X-Y, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED, MOVES, _, MniMaxDepth):-       /* eight possible moves*/
-          tank_move_length(TankMoveLength),
-	  X1 is X, Y1 is Y + TankMoveLength,  add_to_moves(X1-Y1, NextPlayerX2-NextPlayerY2, NextPlayer, VISTED, MOVES1, MniMaxDepth),
-          X2 is X +TankMoveLength, Y2 is Y + TankMoveLength, add_to_moves(X2-Y2, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES1, MOVES2, MniMaxDepth),
-          X3 is X + TankMoveLength, Y3 is Y, add_to_moves(X3-Y3, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES2, MOVES3, MniMaxDepth),
-          X4 is X + TankMoveLength, Y4 is Y - TankMoveLength, add_to_moves(X4-Y4, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES3, MOVES4, MniMaxDepth),
-          X5 is X, Y5 is Y - TankMoveLength, add_to_moves(X5-Y5, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES4, MOVES5, MniMaxDepth),
-          X6 is X - TankMoveLength, Y6 is Y - TankMoveLength, add_to_moves(X6-Y6, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES5, MOVES6, MniMaxDepth),
-          X7 is X - TankMoveLength, Y7 is Y, add_to_moves(X7-Y7, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES6, MOVES7, MniMaxDepth),
-          X8 is X - TankMoveLength, Y8 is Y + TankMoveLength , add_to_moves(X8-Y8, NextPlayerX2-NextPlayerY2, NextPlayer, MOVES7, MOVES, MniMaxDepth).
+add_to_pos_list([X,Y,L,Num], [ [[_,_,_,Num]|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
+    PLAYER = computer,
+    X > 0, X < 1200,                                  /*game borders*/
+    Y > 0, Y < 600,                                   /*game borders*/
+    build_Pos([X,Y,L,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
+    append([Pos], PosList, Result).
 
+add_to_pos_list([X1,Y1,CL1,Num], [CTanks, [[_,_,_,Num]|HTanks], PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
+    PLAYER = humen,
+    X > 0, X < 1200,                                  /*game borders*/
+    Y > 0, Y < 600,                                   /*game borders*/
+    build_Pos([X1,Y1,CL1,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
+    append([Pos], PosList, Result).
 
-add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, MOVES, MniMaxDepth):-
-   (NextPlayer = humen, CX = CurrentPlayerX, CY = CurrentPlayerY, HX = NextPlayerX2, HY = NextPlayerY2
-    ;
-    NextPlayer = computer, CX = NextPlayerX2, CY = NextPlayerY2, HX = CurrentPlayerX, HY = CurrentPlayerY),
-    not(collision(CurrentPlayerX, CurrentPlayerY)),
-    CurrentPlayerX > 0, CurrentPlayerX < 1200,                                  /*game borders*/
-    CurrentPlayerY> 0 , CurrentPlayerY < 600,                                   /*game borders*/
-    append([[CX-CY,HX-HY,NextPlayer,MniMaxDepth]],VISITED,MOVES).
+add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
+    PLAYER = computer,
+    Tank1 \= Tank2,
+    add_to_pos_list(Tank1, [CTanks, HTanks, PLAYER, AlphaBetaDepth], [Tank2|TempTanks], PosList, Result).
+
+add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
+    PLAYER = humen,
+    Tank1 \= Tank2,
+    add_to_pos_list(Tank1, [CTanks, [Tank1|HTanks], PLAYER, AlphaBetaDepth], [Tank1|TempTanks], PosList,Result).
+
+add_to_pos_list(_, _, _, PosList,PosList).
+
+ build_Pos([X1,Y1,CL1,Num],TempTanks, RestCTanks, HTanks, PLAYER, AlphaBetaDepth,Pos):-
+    PLAYER = computer,
+     append(TempTanks, [[X1,Y1,CL1,Num]], HeadCTanks),
+     append(HeadCTanks, RestCTanks, CTanks),
+     Pos = [CTanks, HTanks, humen, AlphaBetaDepth].
+
+ build_Pos([X1,Y1,CL1,Num],TempTanks, CTanks, RestHTanks, PLAYER, AlphaBetaDepth,Pos):-
+    PLAYER = humen,
+     append(TempTanks, [X1,Y1,CL1,Num], HeadHTanks),
+     append(HeadCTanks, RestHTanks, CTanks),
+     Pos = [CTanks, HTanks, computer, AlphaBetaDepth].
+
+shooting_handler(X,Y,[[C1X,C1Y,CL1], [H1X,H1Y,HL1], PLAYER, AlphaBetaDepth],Result):-
+    PLAYER = humen,        /* computer playing*/
+    shooting_check(X,Y,[H1X,H1Y,HL1],HumenTanks),
+    Result = [[C1X,C1Y,CL1], HumenTanks, PLAYER, AlphaBetaDepth].
+
+shooting_handler(X,Y,[[C1X,C1Y,CL1], [H1X,H1Y,HL1], PLAYER, AlphaBetaDepth],Result):-
+    PLAYER = conputer,        /* computer playing*/
+    shooting_check(X,Y,[C1X,C1Y,CL1],HumenTanks),
+    Reult = [[C1X,C1Y,CL1], HumenTanks, PLAYER, AlphaBetaDepth].
+
+shooting_check(X,Y,[X1,Y1,Life], Result):-
+     abs(X - X1,R1),abs(Y - Y1,R2),
+     R1 =< 50, R2 =< 50, 
+     Life1 is Life - 1,
+     Result = [X1,Y1,Life1].
+
+shooting_check(X,Y,Tanks, Tanks).
 
 collision(X,Y):-
         walls(Walls),
@@ -97,41 +138,12 @@ collision(X,Y,[X1-Y1|Walls]):-
     collision(X,Y,Walls).
 
 
-add_to_moves(CurrentPlayerX-CurrentPlayerY, NextPlayerX2-NextPlayerY2, NextPlayer, VISITED, VISITED,_):-
-    CurrentPlayerX =< 0 ; CurrentPlayerX >= 1200;                                 /*game borders*/
-    CurrentPlayerY =< 0 ; CurrentPlayerY >= 600;  
-    collision(CurrentPlayerX, CurrentPlayerY);                                /*game borders*/
-   (walls(Walls), member(CurrentPlayerX-CurrentPlayerY, Walls)).
-
-
-deep_moves(_,Visited,Visited,Depth):-
-    Depth = 5,!.
-
-deep_moves([[CX-CY, HX-HY ,NextPlayer, MniMaxDepth]| MOVES], VISITED, NewMoves, DEPTH):-
-   (PLAYER = computer, X1 = CX, Y1 = CY, X2 = HX, Y2 = HY, NextPlayer = humen
-    ;
-    PLAYER = humen, X1 = HX, Y1 = HY, X2 = CX, Y2 = CY, NextPlayer = computer),
-    add_to_visited([CX-CY, HX-HY ,NextPlayer, MniMaxDepth],VISITED,VISITED1),
-    moves([CX-CY, HX-HY ,PLAYER, MniMaxDepth], VISITED1, MOVES1, DEPTH),
-    deep_moves(MOVES,MOVES1,NewMoves,DEPTH).
-
-deep_moves([],VISITED,VISITED,_).
-
- add_to_visited(Pos,VISITED,VISITED1):-
-        not(member(Pos, VISITED)),
-        append([Pos],VISITED,VISITED1).
-
- add_to_visited(Pos,VISITED,VISITED):-
-        member(Pos, VISITED).
-
-
-
 
 /* ------------------ alpha beta algorithm ------------------*/
 
 alphabeta(Pos, Alpha, Beta, GoodPos, Val):-
     moves(Pos, PosList),!,
-    boundedbest(PosList, Alpha, Beta, GoodPos, Val); 
+    boundedbest(PosList, Alpha, Beta, GoodPos, Val);
     staticval(Pos, Val).
 
 boundedbest([Pos|PosList], Alpha, Beta, GoodPos, GoodVal):-
@@ -176,25 +188,19 @@ min_to_move([_,_,PLAYER,_]):-
 
 
 
-/*-------------------  heuristic function  --------------------*/
 
-staticval([CX-CY, HX-HY, PLAYER, MniMaxDepth],Val):-
-       manhattan_distance([CX,CY],[HX,HY],Distance),
-       shooting_area(ShootingDistance),
-       bad_val(BadVal),
-       tank_move_length(TankMoveLength),
-      (Val1 is BadVal, Distance < TankMoveLength*2   /* too much close*/
-       ;
-       Val1 is BadVal, Distance =< ShootingDistance + TankMoveLength*3,  Distance > ShootingDistance      /* give the opponent the option to enter to the shooting area first */
-       ;
-       Val1 is -Distance + 100 , Distance + TankMoveLength*2 =< ShootingDistance /* enter to the shooting area*/
-       ;
-       Val1 is (-Distance)),
-      (Val2 is 100, abs(CX - HX, R1), abs(CY- HY, R2), abs(R1 - R2, R3), (R1 < 20 ; R2 < 20 ;R3 < 40 )   /* check if the tank is in a shooting line*/
-       ;
-       Val2 is 0),
-       Val is Val1 + Val2.
 
+/*-------------------  evaluation function  --------------------*/
+
+staticval([CTanks, HTanks,_,_],Val):-
+     Val is 3.
+staticval(_,Val):-
+    Val is 4.
+tanks_life_sum([[X,Y,Life,_]|Tanks],Sum):-
+    tanks_life_sum(Tanks,Sum1),
+    Sum is Sum1 + Life.
+
+tanks_life_sum([],0).
 
 manhattan_distance([X1,Y1],[X2,Y2],RES):-
     X is X1 - X2,
@@ -203,10 +209,7 @@ manhattan_distance([X1,Y1],[X2,Y2],RES):-
     RES is PX + PY.
 
 
-
-
-
-/*-------------------  heuristic function  --------------------*/
+/*-------------------  evaluation function  --------------------*/
 
 
 
