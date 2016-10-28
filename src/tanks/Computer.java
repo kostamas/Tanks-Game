@@ -145,7 +145,7 @@ public class Computer {
 
         String alphabetaPos = "[[" + computerPos + "]," + humenPos + ", computer, 1]";
 
-        String bestMoveQuery = "[[ComputerX,ComputerY,Life,Num],_,_,_]";
+        String bestMoveQuery = "[CTanks,_,_]";
         String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-900000, 900000," + bestMoveQuery + ", Val).";
         Query bestMove = new Query(alphabetaQuery);
 

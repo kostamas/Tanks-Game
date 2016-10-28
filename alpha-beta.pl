@@ -27,7 +27,7 @@ bad_val(BadVal):-
 
 
 alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
-    Depth is 2.
+    Depth is 6.
 
 /* ------------ const values  --------------- */
 
@@ -61,7 +61,7 @@ tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
      X4 is X , Y4 is Y + 50,     add_to_pos_list([X4,Y4,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList4),
      X5 is X , Y5 is Y - 50,     add_to_pos_list([X5,Y5,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList4, PosList).
 
-tank_moves([X,Y,L,Num] [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
+tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
      PLAYER = humen,
      X1 is X + 50, Y1 is Y,      add_to_pos_list([X1,Y1,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1),
      X2 is X + 50, Y2 is Y - 50, add_to_pos_list([X2,Y2,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2),
@@ -76,11 +76,11 @@ add_to_pos_list([X,Y,L,Num], [ [[_,_,_,Num]|CTanks], HTanks, PLAYER, AlphaBetaDe
     build_Pos([X,Y,L,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
     append([Pos], PosList, Result).
 
-add_to_pos_list([X1,Y1,CL1,Num], [CTanks, [[_,_,_,Num]|HTanks], PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
+add_to_pos_list([X,Y,L,Num], [CTanks, [[_,_,_,Num]|HTanks], PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
     PLAYER = humen,
     X > 0, X < 1200,                                  /*game borders*/
     Y > 0, Y < 600,                                   /*game borders*/
-    build_Pos([X1,Y1,CL1,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
+    build_Pos([X,Y,L,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
     append([Pos], PosList, Result).
 
 add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
@@ -102,9 +102,9 @@ add_to_pos_list(_, _, _, PosList,PosList).
      Pos = [CTanks, HTanks, humen, AlphaBetaDepth].
 
  build_Pos([X1,Y1,CL1,Num],TempTanks, CTanks, RestHTanks, PLAYER, AlphaBetaDepth,Pos):-
-    PLAYER = humen,
-     append(TempTanks, [X1,Y1,CL1,Num], HeadHTanks),
-     append(HeadCTanks, RestHTanks, CTanks),
+     PLAYER = humen,
+     append(TempTanks, [[X1,Y1,CL1,Num]], HeadHTanks),
+     append(HeadHTanks, RestHTanks, HTanks),
      Pos = [CTanks, HTanks, computer, AlphaBetaDepth].
 
 shooting_handler(X,Y,[[C1X,C1Y,CL1], [H1X,H1Y,HL1], PLAYER, AlphaBetaDepth],Result):-
@@ -196,6 +196,8 @@ staticval([CTanks, HTanks,_,_],Val):-
      Val is 3.
 staticval(_,Val):-
     Val is 4.
+
+
 tanks_life_sum([[X,Y,Life,_]|Tanks],Sum):-
     tanks_life_sum(Tanks,Sum1),
     Sum is Sum1 + Life.
