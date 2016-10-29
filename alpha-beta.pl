@@ -23,11 +23,11 @@ tank_move_length(Length):-
     Length is 50.
 
 bad_val(BadVal):-
-    BadVal is -10000.
+    BadVal is -999999.
 
 
 alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
-    Depth is 2.
+    Depth is 4.
 
 /* ------------ const values  --------------- */
 
@@ -197,12 +197,16 @@ min_to_move([_,_,PLAYER,_]):-
 staticval([CTanks, HTanks,_,_],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
+     closest_humen_eval(CTanks, HTanks, Val2),
+     sum_of_distances(CTanks,HTanks, DistancesSum),
      Val1 is ((CSum-HSum) * 2),
      computer_tanks_clustter(CTanks,MinX,MaxX,MinY,MaxY),
      abs(MaxX-MinX,XDiff), 
      abs(MaxY-MinY,YDiff),
-     (Val2 is (-((XDiff + YDiff)*2)), XDiff + YDiff > 200 ; Val2 is 0),
-     Val is Val1 + Val2.
+     (Val3 is (-(XDiff*2))),
+     (Val4 is (-(YDiff)*2),  YDiff > 150 ; Val4 is 0),
+     Val5 is -DistancesSum,
+     Val is (Val1 + Val2 + Val3 + Val4 + Val5).
      
 
 computer_tanks_clustter([[X,Y,_,_]|CTanks],MinX,MaxX,MinY,MaxY):-
@@ -219,6 +223,49 @@ computer_tanks_clustter([],MinX,MaxX,MinY,MaxY):-
     MaxX is -1.
 
 
+closest_humen_eval([[X1,Y1,_,_]|CTanks],[[X2,Y2,_,_]|HTanks], Val):-
+    closest_humen_eval2([X1,Y1,_,_], [[X2,Y2,_,_]|HTanks], Val1),
+    closest_humen_eval(CTanks, [[X2,Y2,_,_]|HTanks], Val2),
+   (Val is max(Val1,Val2), Val1 > 0, Val2 > 0    /*there is a tank that can shoot*/
+        ;
+    Val is min(Val1,Val2)).
+
+closest_humen_eval([],[[X2,Y2,_,_]|HTanks], 0).
+    
+closest_humen_eval2([X1,Y1,_,_], [[X2,Y2,_,_]|HTanks], Val):-
+       closest_humen_eval2([X1,Y1,_,_], HTanks, Val1),
+       shooting_distance_eval(X1,Y1,X2,Y2,Val2),
+       (Val is max(Val1,Val2), Val1 > 0, Val2 > 0    /*there is a tank that can shoot*/
+        ;
+        Val is min(Val1,Val2)). 
+    
+
+closest_humen_eval2([X1,Y1,_,_], [], 0).
+
+shooting_distance_eval(X1,Y1,X2,Y2,Val):-
+        bad_val(BadVal),
+        abs(X1 - X2,R1), 
+        abs(Y1 - Y2,R2),
+        (Val is 100, R1 =< 50, R2 =< 50            /*tank can shoot*/
+            ;
+         Val is BadVal, (R1 is 100;  R2 is 100)   /*git the humen player the opportunity to shoot first*/
+            ;
+         Val is 0
+        ).
+
+sum_of_distances([[X1,Y1,_,_]|CTanks],[[X2,Y2,_,_]|HTanks], Sum):-
+       sum_of_distances2([X1,Y1,_,_], [[X2,Y2,_,_]|HTanks], Sum1),
+       sum_of_distances(CTanks,[[X2,Y2,_,_]|HTanks], Sum2),
+       Sum is Sum1 + Sum2.
+
+sum_of_distances([],_,0).
+
+sum_of_distances2([X1,Y1,_,_],[[X2,Y2,_,_]|HTanks],Sum):-
+    sum_of_distances2([X1,Y1,_,_],HTanks,Sum1),
+    manhattan_distance([X1,Y1],[X2,Y2],Sum2),
+    Sum is Sum1 + Sum2.
+
+sum_of_distances2(_,[],0).
 
 tanks_life_sum([[X,Y,Life,_]|Tanks],Sum):-
     tanks_life_sum(Tanks,Sum1),
