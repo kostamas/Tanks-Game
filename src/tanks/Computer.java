@@ -16,14 +16,13 @@ import org.jpl7.Term;
 
 public class Computer {
 
-    Tank []computerTanks;
+    Tank[] computerTanks;
     Tank activeTank;
     Tank humenTank;
     Timeline timeline;
     StackPane root;
-    
 
-    public Computer(Tank []computerTanks, Tank humenTank, StackPane root) {
+    public Computer(Tank[] computerTanks, Tank humenTank, StackPane root) {
         this.computerTanks = computerTanks;
         this.humenTank = humenTank;
         String consult = "consult('alpha-beta.pl')";
@@ -56,10 +55,10 @@ public class Computer {
         timelineTurn = new Timeline(new KeyFrame(Duration.millis(250), keyFrameFn -> animateTurn()));
         timelineTurn.setCycleCount(1);  // size + 1: beacause need to run shootingHandler.
         timelineTurn.play();
-        
+
         return null;
     }
-    
+
     private KeyFrame animateTurn() {
         setCorrectDirection();
         shootingHandler();
@@ -111,7 +110,7 @@ public class Computer {
     private void calcTurn(int currentDirection, int nextMoveDirection) {
         boolean turnRight = nextMoveDirection - currentDirection > 0;
         boolean turnOppositeDirection = Math.abs(nextMoveDirection - currentDirection) > 3;
-        
+
         if (turnRight) {
             if (turnOppositeDirection) {
                 this.activeTank.turnLeft();
@@ -132,7 +131,7 @@ public class Computer {
         int computer1X = computerTanks[0].getCurrentPosition()[0];
         int computer1Y = computerTanks[0].getCurrentPosition()[1];
         int computer1Life = computerTanks[0].getLife();
-        
+
         int computer2X = computerTanks[1].getCurrentPosition()[0];
         int computer2Y = computerTanks[1].getCurrentPosition()[1];
         int computer2Life = computerTanks[1].getLife();
@@ -140,12 +139,12 @@ public class Computer {
         String computer1Pos = "[" + computer1X + "," + computer1Y + "," + computer1Life + ",1]";
         String computer2Pos = "[" + computer2X + "," + computer2Y + "," + computer2Life + ",2]";
         String computerPos = computer1Pos + "," + computer2Pos;
-        
+
         String humenPos = "[[" + humenX + "," + humenY + "," + humenLife + ",1]]";
 
         String alphabetaPos = "[[" + computerPos + "]," + humenPos + ", computer, 1]";
 
-        String bestMoveQuery = "[CTanks,_,_]";
+        String bestMoveQuery = "[CTanks,_,_,_]";
         String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-900000, 900000," + bestMoveQuery + ", Val).";
         Query bestMove = new Query(alphabetaQuery);
 
@@ -154,11 +153,23 @@ public class Computer {
         int[] nextMove = new int[2];
         int bestMoveTankNum;
         String shoot;
-        nextMove[0] = ((org.jpl7.Integer) solution.get("ComputerX")).intValue();
-        nextMove[1] = ((org.jpl7.Integer) solution.get("ComputerY")).intValue();
-        bestMoveTankNum = ((org.jpl7.Integer) solution.get("Num")).intValue();
-        activeTank = computerTanks[bestMoveTankNum - 1];
-        
+        Term[] terms = solution.get("CTanks").toTermArray();
+
+        for (int i = 0; i < terms.length; i++) {
+            nextMove[0]  = terms[i].toTermArray()[0].intValue();
+            nextMove[1] = terms[i].toTermArray()[1].intValue();
+            int tankNum = terms[i].toTermArray()[3].intValue();
+            int currentTankX = this.computerTanks[tankNum - 1].getCurrentPosition()[0];
+            int currentTanky = this.computerTanks[tankNum - 1].getCurrentPosition()[1];
+
+            if ( nextMove[0] != currentTankX ||  nextMove[1] != currentTanky) {
+                
+                this.activeTank = this.computerTanks[tankNum - 1];
+                break;
+            }
+        }
+//        activeTank = computerTanks[bestMoveTankNum - 1];
+
         return nextMove;
     }
 

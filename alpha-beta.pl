@@ -27,7 +27,7 @@ bad_val(BadVal):-
 
 
 alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
-    Depth is 6.
+    Depth is 2.
 
 /* ------------ const values  --------------- */
 
@@ -73,14 +73,16 @@ add_to_pos_list([X,Y,L,Num], [ [[_,_,_,Num]|CTanks], HTanks, PLAYER, AlphaBetaDe
     PLAYER = computer,
     X > 0, X < 1200,                                  /*game borders*/
     Y > 0, Y < 600,                                   /*game borders*/
-    build_Pos([X,Y,L,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
+    reverse(TempTanks, TempTanks1),
+    build_Pos([X,Y,L,Num],TempTanks1, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
     append([Pos], PosList, Result).
 
 add_to_pos_list([X,Y,L,Num], [CTanks, [[_,_,_,Num]|HTanks], PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
     PLAYER = humen,
     X > 0, X < 1200,                                  /*game borders*/
     Y > 0, Y < 600,                                   /*game borders*/
-    build_Pos([X,Y,L,Num],TempTanks, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
+    reverse(TempTanks, TempTanks1),
+    build_Pos([X,Y,L,Num],TempTanks1, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
     append([Pos], PosList, Result).
 
 add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
@@ -193,9 +195,29 @@ min_to_move([_,_,PLAYER,_]):-
 /*-------------------  evaluation function  --------------------*/
 
 staticval([CTanks, HTanks,_,_],Val):-
-     Val is 3.
-staticval(_,Val):-
-    Val is 4.
+     tanks_life_sum(CTanks,CSum),
+     tanks_life_sum(HTanks,HSum),
+     Val1 is ((CSum-HSum) * 2),
+     computer_tanks_clustter(CTanks,MinX,MaxX,MinY,MaxY),
+     abs(MaxX-MinX,XDiff), 
+     abs(MaxY-MinY,YDiff),
+     (Val2 is (-((XDiff + YDiff)*2)), XDiff + YDiff > 200 ; Val2 is 0),
+     Val is Val1 + Val2.
+     
+
+computer_tanks_clustter([[X,Y,_,_]|CTanks],MinX,MaxX,MinY,MaxY):-
+    computer_tanks_clustter(CTanks,MinX1,MaxX1,MinY1,MaxY1),
+    (X > MaxX1, MaxX is X ; MaxX is MaxX1),
+    (X < MinX1, MinX is X ; MinX is MinX1),
+    (Y > MaxY1, MaxY is Y ; MaxY is MaxY1),
+    (Y < MinY1, MinY is Y ; MinY is MinY1).
+
+computer_tanks_clustter([],MinX,MaxX,MinY,MaxY):-
+    MinX is 90000,
+    MinY is 90000,
+    MaxY is -1,
+    MaxX is -1.
+
 
 
 tanks_life_sum([[X,Y,Life,_]|Tanks],Sum):-
