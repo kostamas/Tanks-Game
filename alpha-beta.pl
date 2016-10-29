@@ -90,43 +90,39 @@ add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTan
     Tank1 \= Tank2,
     add_to_pos_list(Tank1, [CTanks, HTanks, PLAYER, AlphaBetaDepth], [Tank2|TempTanks], PosList, Result).
 
-add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
+add_to_pos_list(Tank1, [CTanks, [Tank2|HTanks], PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
     PLAYER = humen,
     Tank1 \= Tank2,
-    add_to_pos_list(Tank1, [CTanks, [Tank1|HTanks], PLAYER, AlphaBetaDepth], [Tank1|TempTanks], PosList,Result).
+    add_to_pos_list(Tank1, [CTanks, HTanks, PLAYER, AlphaBetaDepth], [Tank1|TempTanks], PosList, Result).
 
 add_to_pos_list(_, _, _, PosList,PosList).
 
  build_Pos([X1,Y1,CL1,Num],TempTanks, RestCTanks, HTanks, PLAYER, AlphaBetaDepth,Pos):-
     PLAYER = computer,
-     append(TempTanks, [[X1,Y1,CL1,Num]], HeadCTanks),
-     append(HeadCTanks, RestCTanks, CTanks),
-     Pos = [CTanks, HTanks, humen, AlphaBetaDepth].
+    append(TempTanks, [[X1,Y1,CL1,Num]], HeadCTanks),
+    append(HeadCTanks, RestCTanks, CTanks),
+    shooting_handler(X1, Y1, HTanks, HTanks1),
+    Pos = [CTanks, HTanks1, humen, AlphaBetaDepth].
 
  build_Pos([X1,Y1,CL1,Num],TempTanks, CTanks, RestHTanks, PLAYER, AlphaBetaDepth,Pos):-
-     PLAYER = humen,
-     append(TempTanks, [[X1,Y1,CL1,Num]], HeadHTanks),
-     append(HeadHTanks, RestHTanks, HTanks),
-     Pos = [CTanks, HTanks, computer, AlphaBetaDepth].
+    PLAYER = humen,
+    append(TempTanks, [[X1,Y1,CL1,Num]], HeadHTanks),
+    append(HeadHTanks, RestHTanks, HTanks),
+    shooting_handler(X1, Y1, CTanks, CTanks1),
+    Pos = [CTanks1, HTanks, computer, AlphaBetaDepth].
 
-shooting_handler(X,Y,[[C1X,C1Y,CL1], [H1X,H1Y,HL1], PLAYER, AlphaBetaDepth],Result):-
-    PLAYER = humen,        /* computer playing*/
-    shooting_check(X,Y,[H1X,H1Y,HL1],HumenTanks),
-    Result = [[C1X,C1Y,CL1], HumenTanks, PLAYER, AlphaBetaDepth].
 
-shooting_handler(X,Y,[[C1X,C1Y,CL1], [H1X,H1Y,HL1], PLAYER, AlphaBetaDepth],Result):-
-    PLAYER = conputer,        /* computer playing*/
-    shooting_check(X,Y,[C1X,C1Y,CL1],HumenTanks),
-    Reult = [[C1X,C1Y,CL1], HumenTanks, PLAYER, AlphaBetaDepth].
+shooting_handler(X,Y, [[X1,Y1,L1,Num]|Tanks],[[X1,Y1,L,Num]|Tanks]):-
+    abs(X - X1,R1),abs(Y - Y1,R2),
+    R1 =< 50, R2 =< 50, 
+    L is L1 - 1,!.
 
-shooting_check(X,Y,[X1,Y1,Life], Result):-
-     abs(X - X1,R1),abs(Y - Y1,R2),
-     R1 =< 50, R2 =< 50, 
-     Life1 is Life - 1,
-     Result = [X1,Y1,Life1].
+shooting_handler(X,Y, [[X1,Y1,L1,Num]|Tanks],[[X1,Y1,L1,Num]|Tanks]):-
+    shooting_handler(X,Y, Tanks,Tanks),!.
 
-shooting_check(X,Y,Tanks, Tanks).
+shooting_handler(_,_,[],[]).
 
+     
 collision(X,Y):-
         walls(Walls),
         collision(X,Y,Walls).
