@@ -46,16 +46,16 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         root.setBackground(new Background(myBI));
 
         Tank []humenTanks = new Tank[3];
-        humenTanks[0] = new Tank(50, 150, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-        humenTanks[1] = new Tank(50, 450, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-        humenTanks[2] = new Tank(100, 250, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTanks[0] = new Tank(150, 250, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTanks[1] = new Tank(150, 300, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTanks[2] = new Tank(150, 450, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
 
         
      
         Tank []computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(600,100, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        computerTanks[1] = new Tank(900,300, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        computerTanks[2] = new Tank(800,500, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTanks[0] = new Tank(350,150, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTanks[1] = new Tank(350,300, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTanks[2] = new Tank(350,500, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
 
         
         root.getChildren().add(computerTanks[0]);

@@ -23,7 +23,7 @@ tank_move_length(Length):-
     Length is 50.
 
 bad_val(BadVal):-
-    BadVal is -999999.
+    BadVal is -2000.
 
 
 alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
@@ -39,7 +39,7 @@ moves([_,_, _, AlphaBetaDepth], _):-
 moves([CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
     AlphaBetaDepth2 is AlphaBetaDepth + 1,
     (
-       PLAYER = computer, next_moves(CTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList) ; 
+       PLAYER = computer, next_moves(CTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList); 
        PLAYER = humen, next_moves(HTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList)
     ).
 
@@ -54,7 +54,7 @@ next_moves([],_,[]).
 
 
 tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
-     PLAYER = computer,
+     PLAYER = computer,!,
      X1 is X - 50, Y1 is Y,      add_to_pos_list([X1,Y1,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1),
      X2 is X - 50, Y2 is Y - 50, add_to_pos_list([X2,Y2,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2),
      X3 is X - 50, Y3 is Y + 50, add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3),
@@ -71,22 +71,24 @@ tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
 
 add_to_pos_list([X,Y,L,Num], [ [[_,_,_,Num]|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
     PLAYER = computer,
-    X > 0, X < 1200,                                  /*game borders*/
-    Y > 0, Y < 600,                                   /*game borders*/
+    not(collision(X,Y,Num,computer,computer,CTanks)),
+    not(collision(X,Y,Num,computer,computer,TempTanks)),
+    not(collision(X,Y,Num,computer,humen,HTanks)),
     reverse(TempTanks, TempTanks1),
     build_Pos([X,Y,L,Num],TempTanks1, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
-    append([Pos], PosList, Result).
+    append([Pos], PosList, Result),!.
 
 add_to_pos_list([X,Y,L,Num], [CTanks, [[_,_,_,Num]|HTanks], PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
-    PLAYER = humen,
-    X > 0, X < 1200,                                  /*game borders*/
-    Y > 0, Y < 600,                                   /*game borders*/
+    PLAYER = humen,                                 
+    not(collision(X,Y,Num,humen,computer,CTanks)),
+    not(collision(X,Y,Num,humen,humen,TempTanks)),
+    not(collision(X,Y,Num,humen,humen,HTanks)),
     reverse(TempTanks, TempTanks1),
     build_Pos([X,Y,L,Num],TempTanks1, CTanks, HTanks, PLAYER, AlphaBetaDepth,Pos),
-    append([Pos], PosList, Result).
+    append([Pos], PosList, Result),!.
 
 add_to_pos_list(Tank1, [[Tank2|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList, Result):-
-    PLAYER = computer,
+    PLAYER = computer,!,
     Tank1 \= Tank2,
     add_to_pos_list(Tank1, [CTanks, HTanks, PLAYER, AlphaBetaDepth], [Tank2|TempTanks], PosList, Result).
 
@@ -98,14 +100,14 @@ add_to_pos_list(Tank1, [CTanks, [Tank2|HTanks], PLAYER, AlphaBetaDepth], TempTan
 add_to_pos_list(_, _, _, PosList,PosList).
 
  build_Pos([X1,Y1,CL1,Num],TempTanks, RestCTanks, HTanks, PLAYER, AlphaBetaDepth,Pos):-
-    PLAYER = computer,
+    PLAYER = computer,!,
     append(TempTanks, [[X1,Y1,CL1,Num]], HeadCTanks),
     append(HeadCTanks, RestCTanks, CTanks),
     shooting_handler(X1, Y1, HTanks, HTanks1),
     Pos = [CTanks, HTanks1, humen, AlphaBetaDepth].
 
  build_Pos([X1,Y1,CL1,Num],TempTanks, CTanks, RestHTanks, PLAYER, AlphaBetaDepth,Pos):-
-    PLAYER = humen,
+    PLAYER = humen,!,
     append(TempTanks, [[X1,Y1,CL1,Num]], HeadHTanks),
     append(HeadHTanks, RestHTanks, HTanks),
     shooting_handler(X1, Y1, CTanks, CTanks1),
@@ -123,18 +125,16 @@ shooting_handler(X,Y, [[X1,Y1,L1,Num]|Tanks],[[X1,Y1,L1,Num]|Tanks]):-
 shooting_handler(_,_,[],[]).
 
      
-collision(X,Y):-
-        walls(Walls),
-        collision(X,Y,Walls).
 
-collision(X,Y,[]):- fail.
 
-collision(X,Y,[X1-Y1|Walls]):-
-    X + 30 >= X1, X < X1 + 50,
-    Y + 30 >= Y1, Y < Y1 + 50
+collision(X,Y,Num,Player1,Player2,[[X1,Y1,_,Num1]|Tanks]):-
+    (X = X1, Y = Y1, (Num \= Num1 ; Player1 \= Player2))
     ;
-    collision(X,Y,Walls).
+    (X < 100 ; X > 1550,  Y < 50 ; Y > 500),!                                /*game borders*/
+    ;
+    collision(X,Y,Num,Player1,Player2,Tanks).
 
+collision(_,_,_,_,_):-fail.
 
 
 /* ------------------ alpha beta algorithm ------------------*/
@@ -193,24 +193,22 @@ min_to_move([_,_,PLAYER,_]):-
 staticval([CTanks, HTanks,_,_],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
-     closest_humen_eval(CTanks, HTanks, Val2),
      sum_of_distances(CTanks,HTanks, DistancesSum),
-     Val1 is ((CSum-HSum) * 2),
+     Val1 is ((CSum - HSum) * 20000000),
      computer_tanks_clustter(CTanks,MinX,MaxX,MinY,MaxY),
      abs(MaxX-MinX,XDiff), 
      abs(MaxY-MinY,YDiff),
      (Val3 is (-(XDiff*2))),
      (Val4 is (-(YDiff)*3),  YDiff > 100 ; Val4 is 0),
      Val5 is -DistancesSum,
-     Val is (Val1 + Val2 + Val3 + Val4 + Val5).
-     
+     Val is (Val1 + Val3 + Val4 + Val5).
 
 computer_tanks_clustter([[X,Y,_,_]|CTanks],MinX,MaxX,MinY,MaxY):-
     computer_tanks_clustter(CTanks,MinX1,MaxX1,MinY1,MaxY1),
-    (X > MaxX1, MaxX is X ; MaxX is MaxX1),
-    (X < MinX1, MinX is X ; MinX is MinX1),
-    (Y > MaxY1, MaxY is Y ; MaxY is MaxY1),
-    (Y < MinY1, MinY is Y ; MinY is MinY1).
+    (X > MaxX1, MaxX is X, ! ; MaxX is MaxX1),
+    (X < MinX1, MinX is X, ! ; MinX is MinX1),
+    (Y > MaxY1, MaxY is Y, ! ; MaxY is MaxY1),
+    (Y < MinY1, MinY is Y, ! ; MinY is MinY1).
 
 computer_tanks_clustter([],MinX,MaxX,MinY,MaxY):-
     MinX is 90000,
@@ -218,36 +216,6 @@ computer_tanks_clustter([],MinX,MaxX,MinY,MaxY):-
     MaxY is -1,
     MaxX is -1.
 
-
-closest_humen_eval([[X1,Y1,_,_]|CTanks],[[X2,Y2,_,_]|HTanks], Val):-
-    closest_humen_eval2([X1,Y1,_,_], [[X2,Y2,_,_]|HTanks], Val1),
-    closest_humen_eval(CTanks, [[X2,Y2,_,_]|HTanks], Val2),
-   (Val is max(Val1,Val2), Val1 > 0, Val2 > 0    /*there is a tank that can shoot*/
-        ;
-    Val is min(Val1,Val2)).
-
-closest_humen_eval([],[[X2,Y2,_,_]|HTanks], 0).
-    
-closest_humen_eval2([X1,Y1,_,_], [[X2,Y2,_,_]|HTanks], Val):-
-       closest_humen_eval2([X1,Y1,_,_], HTanks, Val1),
-       shooting_distance_eval(X1,Y1,X2,Y2,Val2),
-       (Val is max(Val1,Val2), Val1 > 0, Val2 > 0    /*there is a tank that can shoot*/
-        ;
-        Val is min(Val1,Val2)). 
-    
-
-closest_humen_eval2([X1,Y1,_,_], [], 0).
-
-shooting_distance_eval(X1,Y1,X2,Y2,Val):-
-        bad_val(BadVal),
-        abs(X1 - X2,R1), 
-        abs(Y1 - Y2,R2),
-        (Val is 10000, R1 =< 50, R2 =< 50            /*tank can shoot*/
-            ;
-         Val is BadVal, (R1 is 100;  R2 is 100)   /*git the humen player the opportunity to shoot first*/
-            ;
-         Val is 0
-        ).
 
 sum_of_distances([[X1,Y1,_,_]|CTanks],[[X2,Y2,_,_]|HTanks], Sum):-
        sum_of_distances2([X1,Y1,_,_], [[X2,Y2,_,_]|HTanks], Sum1),
