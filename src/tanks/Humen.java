@@ -7,16 +7,14 @@ import javafx.scene.layout.StackPane;
 public class Humen {
 
     private Tank activeTank;
-    private Tank humenTank1;
-    private Tank humenTank2;
+    private Tank[] humenTanks;
     StackPane root;
     GameController gameController;
 
 
-    public Humen(Tank tank, Tank tank1, Tank tank2, StackPane root, GameController gameController) {
-        activeTank = tank;
-        humenTank1 = tank1;
-        humenTank2 = tank2;
+    public Humen(Tank activeTank, Tank[] humenTanks, StackPane root, GameController gameController) {
+        this.activeTank = activeTank;
+        this.humenTanks = humenTanks;
         this.root = root;
         this.gameController = gameController;
     }
@@ -27,11 +25,15 @@ public class Humen {
         }
 
         if (event.getCode() == KeyCode.DIGIT1) {
-            activeTank = humenTank1;
+            activeTank = humenTanks[0];
         }
 
         if (event.getCode() == KeyCode.DIGIT2) {
-            activeTank = humenTank2;
+            activeTank = humenTanks[1];
+        }
+        
+         if (event.getCode() == KeyCode.DIGIT3) {
+            activeTank = humenTanks[2];
         }
 
         if (event.getCode() == KeyCode.RIGHT) {

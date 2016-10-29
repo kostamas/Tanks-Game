@@ -28,8 +28,6 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
     private TilePane tilePane;
     private Scene scene;
-    private Tank humenTank1, humenTank2;
-    private Tank computerTank1, computerTank2;
     GameController gameController;
     StackPane root;
     Humen humen;
@@ -47,21 +45,27 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
-        humenTank1 = new Tank(50, 150, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-        humenTank2 = new Tank(50, 450, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-
-        computerTank1 = new Tank(600,100, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        computerTank2 = new Tank(900,300, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        Tank []computerTanks = new Tank[3];
-        computerTanks[0] = computerTank1;
-        computerTanks[1] = computerTank2;
+        Tank []humenTanks = new Tank[3];
+        humenTanks[0] = new Tank(50, 150, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTanks[1] = new Tank(50, 450, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTanks[2] = new Tank(100, 250, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
 
         
-        root.getChildren().add(humenTank1);
-        root.getChildren().add(humenTank2);
+     
+        Tank []computerTanks = new Tank[3];
+        computerTanks[0] = new Tank(600,100, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTanks[1] = new Tank(900,300, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTanks[2] = new Tank(800,500, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
 
-        root.getChildren().add(computerTank1);
-        root.getChildren().add(computerTank2);
+        
+        root.getChildren().add(computerTanks[0]);
+        root.getChildren().add(computerTanks[1]);
+        root.getChildren().add(computerTanks[2]);
+
+        root.getChildren().add(humenTanks[0]);
+        root.getChildren().add(humenTanks[1]);
+        root.getChildren().add(humenTanks[2]);
+
 
         Walls walls = new Walls(50, "assets/wall.png");
         root.getChildren().add(walls);
@@ -69,11 +73,13 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         scene.setOnKeyPressed(this);
 
         primaryStage.setScene(scene);
-        Tank tanks[] = new Tank[4];
-        tanks[0] = humenTank1;
-        tanks[1] = humenTank2;
-        tanks[2] = computerTank1;
-        tanks[3] = computerTank2;
+        Tank tanks[] = new Tank[6];
+        tanks[0] = computerTanks[0];
+        tanks[1] = computerTanks[1];
+        tanks[2] = computerTanks[2];
+        tanks[3] = humenTanks[0];
+        tanks[4] = humenTanks[1];
+        tanks[5] = humenTanks[2];
 
         new GameStatus(tanks, root);
 
@@ -83,9 +89,9 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         root.getChildren().add(canvas);
 
         primaryStage.show();
-        Computer computer = new Computer(computerTanks, humenTank1, root);
+        Computer computer = new Computer(computerTanks, humenTanks, root);
         gameController = new GameController(scene, computer);
-        humen = new Humen(humenTank1, humenTank1, humenTank2, root, gameController);
+        humen = new Humen(humenTanks[0], humenTanks, root, gameController);
 
         gameController.turnHanlder(0);
     }

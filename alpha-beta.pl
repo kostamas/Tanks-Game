@@ -200,7 +200,7 @@ staticval([CTanks, HTanks,_,_],Val):-
      abs(MaxX-MinX,XDiff), 
      abs(MaxY-MinY,YDiff),
      (Val3 is (-(XDiff*2))),
-     (Val4 is (-(YDiff)*2),  YDiff > 150 ; Val4 is 0),
+     (Val4 is (-(YDiff)*3),  YDiff > 100 ; Val4 is 0),
      Val5 is -DistancesSum,
      Val is (Val1 + Val2 + Val3 + Val4 + Val5).
      
@@ -242,7 +242,7 @@ shooting_distance_eval(X1,Y1,X2,Y2,Val):-
         bad_val(BadVal),
         abs(X1 - X2,R1), 
         abs(Y1 - Y2,R2),
-        (Val is 100, R1 =< 50, R2 =< 50            /*tank can shoot*/
+        (Val is 10000, R1 =< 50, R2 =< 50            /*tank can shoot*/
             ;
          Val is BadVal, (R1 is 100;  R2 is 100)   /*git the humen player the opportunity to shoot first*/
             ;

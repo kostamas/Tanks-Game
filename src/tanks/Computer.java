@@ -17,14 +17,14 @@ import org.jpl7.Term;
 public class Computer {
 
     Tank[] computerTanks;
+    Tank[] humenTanks;
     Tank activeTank;
-    Tank humenTank;
     Timeline timeline;
     StackPane root;
 
-    public Computer(Tank[] computerTanks, Tank humenTank, StackPane root) {
+    public Computer(Tank[] computerTanks, Tank[] humenTanks, StackPane root) {
         this.computerTanks = computerTanks;
-        this.humenTank = humenTank;
+        this.humenTanks = humenTanks;
         String consult = "consult('alpha-beta.pl')";
         Query query = new Query(consult);
         query.hasSolution();
@@ -33,19 +33,15 @@ public class Computer {
     }
 
     public void play() {
-        int x = humenTank.getCurrentPosition()[0];
-        int y = humenTank.getCurrentPosition()[1];
-        int life = humenTank.getLife();
-
         int[] nextMove = new int[2];
         int nextX, nextY;
 
-        nextMove = askForNextMove(x, y, life);
+        nextMove = askForNextMove();
         nextX = nextMove[0];
         nextY = nextMove[1];
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(1450), keyFrameFn -> animate(nextX, nextY)));
-        timeline.setCycleCount(1);  // size + 1: beacause need to run shootingHandler.
+        timeline = new Timeline(new KeyFrame(Duration.millis(450), keyFrameFn -> animate(nextX, nextY)));
+        timeline.setCycleCount(1);
         timeline.play();
     }
 
@@ -53,7 +49,7 @@ public class Computer {
         moveTank(nextX, nextY);
         Timeline timelineTurn = timeline;
         timelineTurn = new Timeline(new KeyFrame(Duration.millis(250), keyFrameFn -> animateTurn()));
-        timelineTurn.setCycleCount(1);  // size + 1: beacause need to run shootingHandler.
+        timelineTurn.setCycleCount(1);
         timelineTurn.play();
 
         return null;
@@ -126,23 +122,31 @@ public class Computer {
         }
     }
 
-    private int[] askForNextMove(int humenX, int humenY, int humenLife) {
+    private int[] askForNextMove() {
+        String computerTanksPos = "";
+        String humenTanksPos = "";
 
-        int computer1X = computerTanks[0].getCurrentPosition()[0];
-        int computer1Y = computerTanks[0].getCurrentPosition()[1];
-        int computer1Life = computerTanks[0].getLife();
+        for (int i = 0; i < this.computerTanks.length; i++) {
+            int computerX = computerTanks[i].getCurrentPosition()[0];
+            int computerY = computerTanks[i].getCurrentPosition()[1];
+            int computerLife = computerTanks[i].getLife();
+            if (computerLife > 0) {
+                computerTanksPos += "[" + computerX + "," + computerY + "," + computerLife + "," + (i+1) +"]";
+                computerTanksPos += (i < this.computerTanks.length - 1) ? "," : "";
+            }
+        }
 
-        int computer2X = computerTanks[1].getCurrentPosition()[0];
-        int computer2Y = computerTanks[1].getCurrentPosition()[1];
-        int computer2Life = computerTanks[1].getLife();
+        for (int i = 0; i < this.humenTanks.length; i++) {
+            int humenX = humenTanks[i].getCurrentPosition()[0];
+            int humenY = humenTanks[i].getCurrentPosition()[1];
+            int humenLife = humenTanks[i].getLife();
+            if (humenLife > 0) {
+                humenTanksPos += "[" + humenX + "," + humenY + "," + humenLife + "," + (i+1) +"]";
+                humenTanksPos += (i < this.humenTanks.length - 1) ? "," : "";
+            }
+        }
 
-        String computer1Pos = "[" + computer1X + "," + computer1Y + "," + computer1Life + ",1]";
-        String computer2Pos = "[" + computer2X + "," + computer2Y + "," + computer2Life + ",2]";
-        String computerPos = computer1Pos + "," + computer2Pos;
-
-        String humenPos = "[[" + humenX + "," + humenY + "," + humenLife + ",1]]";
-
-        String alphabetaPos = "[[" + computerPos + "]," + humenPos + ", computer, 1]";
+        String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer, 1]";
 
         String bestMoveQuery = "[CTanks,_,_,_]";
         String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-900000, 900000," + bestMoveQuery + ", Val).";
@@ -156,14 +160,14 @@ public class Computer {
         Term[] terms = solution.get("CTanks").toTermArray();
 
         for (int i = 0; i < terms.length; i++) {
-            nextMove[0]  = terms[i].toTermArray()[0].intValue();
+            nextMove[0] = terms[i].toTermArray()[0].intValue();
             nextMove[1] = terms[i].toTermArray()[1].intValue();
             int tankNum = terms[i].toTermArray()[3].intValue();
             int currentTankX = this.computerTanks[tankNum - 1].getCurrentPosition()[0];
             int currentTanky = this.computerTanks[tankNum - 1].getCurrentPosition()[1];
 
-            if ( nextMove[0] != currentTankX ||  nextMove[1] != currentTanky) {
-                
+            if (nextMove[0] != currentTankX || nextMove[1] != currentTanky) {
+
                 this.activeTank = this.computerTanks[tankNum - 1];
                 break;
             }
@@ -190,8 +194,10 @@ public class Computer {
     private void setCorrectDirection() {
         int cx = this.activeTank.getCurrentPosition()[0];
         int cy = this.activeTank.getCurrentPosition()[1];
-        int hx = this.humenTank.getCurrentPosition()[0];
-        int hy = this.humenTank.getCurrentPosition()[1];
+
+        int hx = this.humenTanks[0].getCurrentPosition()[0];  //todo - get from closest tank!
+        int hy = this.humenTanks[0].getCurrentPosition()[1];
+
         int nextDirection = -1;
         String yDirection = "";
         String xDirection = "";
@@ -227,8 +233,8 @@ public class Computer {
     private void shootingHandler() {
         int cx = this.activeTank.getCurrentPosition()[0];
         int cy = this.activeTank.getCurrentPosition()[1];
-        int hx = this.humenTank.getCurrentPosition()[0];
-        int hy = this.humenTank.getCurrentPosition()[1];
+        int hx = this.humenTanks[0].getCurrentPosition()[0];
+        int hy = this.humenTanks[0].getCurrentPosition()[1];
 
         if (Math.abs(cx - hx) > TankConst.shootingArea || Math.abs(cy - hy) > TankConst.shootingArea) {
             return;
