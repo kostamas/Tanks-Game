@@ -49,8 +49,6 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         humenTanks[0] = new Tank(300, 100, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
         humenTanks[1] = new Tank(350, 200, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
         humenTanks[2] = new Tank(300, 300, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-
-        
      
         Tank []computerTanks = new Tank[3];
         computerTanks[0] = new Tank(550,100, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
@@ -61,7 +59,6 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         root.getChildren().add(computerTanks[0]);
         root.getChildren().add(computerTanks[1]);
         root.getChildren().add(computerTanks[2]);
-
         root.getChildren().add(humenTanks[0]);
         root.getChildren().add(humenTanks[1]);
         root.getChildren().add(humenTanks[2]);
@@ -73,15 +70,8 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         scene.setOnKeyPressed(this);
 
         primaryStage.setScene(scene);
-        Tank tanks[] = new Tank[6];
-        tanks[0] = computerTanks[0];
-        tanks[1] = computerTanks[1];
-        tanks[2] = computerTanks[2];
-        tanks[3] = humenTanks[0];
-        tanks[4] = humenTanks[1];
-        tanks[5] = humenTanks[2];
 
-        new GameStatus(tanks, root);
+        new GameStatus(computerTanks, humenTanks, root);
 
         Canvas canvas = new Canvas(1300, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -93,7 +83,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         gameController = new GameController(scene, computer);
         humen = new Humen(humenTanks[0], humenTanks, root, gameController);
 
-        gameController.turnHanlder(0);
+        gameController.turnHanlder(TankConst.HUMEN);
     }
 
     @Override
