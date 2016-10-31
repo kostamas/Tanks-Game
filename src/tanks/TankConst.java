@@ -13,7 +13,7 @@ public class TankConst {
     static final int COMPUTER = 0;
     static final int STEPS = 1;
     static final int HUMEN = 1;
-    static final int TANK_LIFE = 3;
+    static final int TANK_LIFE = 9;
     static String[] directions = {"up", "up_right", "right", "down_right", "down", "down_left", "left", "up_left"};
     static int[][] bulletOffsetByDirection = {{10, 0}, {30, 0}, {37, 11}, {35, 35}, {10, 35}, {-5, 35}, {0, 11}, {0, 0}};
 

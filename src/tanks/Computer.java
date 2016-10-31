@@ -39,10 +39,14 @@ public class Computer {
         nextMove = askForNextMove();
         nextX = nextMove[0];
         nextY = nextMove[1];
-
-        timeline = new Timeline(new KeyFrame(Duration.millis(450), keyFrameFn -> animate(nextX, nextY)));
-        timeline.setCycleCount(1);
-        timeline.play();
+        if (nextX > 0 && nextY > 0) {
+            timeline = new Timeline(new KeyFrame(Duration.millis(450), keyFrameFn -> animate(nextX, nextY)));
+            timeline.setCycleCount(1);
+            timeline.play();
+        } else {
+            generalShootingHandler();
+            GameController.setActivePlayer(TankConst.HUMEN);
+        }
     }
 
     private KeyFrame animate(int nextX, int nextY) {
@@ -56,7 +60,7 @@ public class Computer {
     }
 
     private KeyFrame animateTurn() {
-        setCorrectDirection();
+        setCorrectDirection(this.activeTank);
         shootingHandler();
         GameController.setActivePlayer(TankConst.HUMEN);
         return null;
@@ -74,7 +78,7 @@ public class Computer {
         if (currentDirection == nextMoveDirection) {
             activeTank.move(nextX, nextY, "assets/tank2_" + GameStatus.directions[nextMoveDirection] + ".png");
         } else {
-            calcTurn(currentDirection, nextMoveDirection);
+            calcTurn(currentDirection, nextMoveDirection, activeTank);
             moveTank(nextX, nextY);
         }
     }
@@ -103,21 +107,21 @@ public class Computer {
         return -1;
     }
 
-    private void calcTurn(int currentDirection, int nextMoveDirection) {
+    private void calcTurn(int currentDirection, int nextMoveDirection, Tank cTank) {
         boolean turnRight = nextMoveDirection - currentDirection > 0;
         boolean turnOppositeDirection = Math.abs(nextMoveDirection - currentDirection) > 3;
 
         if (turnRight) {
             if (turnOppositeDirection) {
-                this.activeTank.turnLeft();
+                cTank.turnLeft();
             } else {
-                this.activeTank.turnRight();
+                cTank.turnRight();
             }
         } else {
             if (turnOppositeDirection) {
-                this.activeTank.turnRight();
+                cTank.turnRight();
             } else {
-                this.activeTank.turnLeft();
+                cTank.turnLeft();
             }
         }
     }
@@ -149,7 +153,7 @@ public class Computer {
         String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer, 1]";
 
         String bestMoveQuery = "[CTanks,_,_,_]";
-        String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-999999999, 999999999," + bestMoveQuery + ", Val).";
+        String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-99999, 99999," + bestMoveQuery + ", Val).";
         Query bestMove = new Query(alphabetaQuery);
 
         Map<String, Term> solution = bestMove.oneSolution();
@@ -160,14 +164,17 @@ public class Computer {
         Term[] terms = solution.get("CTanks").toTermArray();
 
         for (int i = 0; i < terms.length; i++) {
-            nextMove[0] = terms[i].toTermArray()[0].intValue();
-            nextMove[1] = terms[i].toTermArray()[1].intValue();
+            int tmpX = terms[i].toTermArray()[0].intValue();
+            int tmpY = terms[i].toTermArray()[1].intValue();
+
             int tankNum = terms[i].toTermArray()[3].intValue();
             int currentTankX = this.computerTanks[tankNum - 1].getCurrentPosition()[0];
             int currentTanky = this.computerTanks[tankNum - 1].getCurrentPosition()[1];
 
-            if (nextMove[0] != currentTankX || nextMove[1] != currentTanky) {
+            if (tmpX != currentTankX || tmpY != currentTanky) {
 
+                nextMove[0] = tmpX;
+                nextMove[1] = tmpY;
                 this.activeTank = this.computerTanks[tankNum - 1];
                 break;
             }
@@ -190,17 +197,17 @@ public class Computer {
         return false;
     }
 
-    private void setCorrectDirection() {
-        int cx = this.activeTank.getCurrentPosition()[0];
-        int cy = this.activeTank.getCurrentPosition()[1];
+    private void setCorrectDirection(Tank cTank) {
+        int cx = cTank.getCurrentPosition()[0];
+        int cy = cTank.getCurrentPosition()[1];
 
         int hx = 0, hy = 0;
         int minDistance = 100000;
         for (int i = 0; i < this.humenTanks.length; i++) {
             int tmpX = this.humenTanks[i].getCurrentPosition()[0];
             int tmpY = this.humenTanks[i].getCurrentPosition()[1];
-            if(Math.abs(tmpX-cx) + Math.abs(tmpY-cy) < minDistance){
-                minDistance = Math.abs(tmpX-cx) + Math.abs(tmpY-cy);
+            if (Math.abs(tmpX - cx) + Math.abs(tmpY - cy) < minDistance) {
+                minDistance = Math.abs(tmpX - cx) + Math.abs(tmpY - cy);
                 hx = tmpX;
                 hy = tmpY;
             }
@@ -231,9 +238,9 @@ public class Computer {
             }
         }
 
-        if (this.activeTank.getDirection() != nextDirection) {
-            calcTurn(this.activeTank.getDirection(), nextDirection);
-            setCorrectDirection();
+        if (cTank.getDirection() != nextDirection) {
+            calcTurn(cTank.getDirection(), nextDirection, cTank);
+            setCorrectDirection(cTank);
         }
 
     }
@@ -241,7 +248,7 @@ public class Computer {
     private void shootingHandler() {
         int cx = this.activeTank.getCurrentPosition()[0];
         int cy = this.activeTank.getCurrentPosition()[1];
-        setCorrectDirection();
+        setCorrectDirection(this.activeTank);
         for (int i = 0; i < this.humenTanks.length; i++) {
             int hx = this.humenTanks[i].getCurrentPosition()[0];
             int hy = this.humenTanks[i].getCurrentPosition()[1];
@@ -251,7 +258,26 @@ public class Computer {
                 break;
             }
         }
+    }
 
+    private void generalShootingHandler() {
+        boolean isShooted = false;
+        for (int i = 0; !isShooted && i < this.computerTanks.length; i++) {
+            int cx = this.computerTanks[i].getCurrentPosition()[0];
+            int cy = this.computerTanks[i].getCurrentPosition()[1];
+
+            for (int j = 0; !isShooted && j < this.humenTanks.length; j++) {
+                int hx = this.humenTanks[j].getCurrentPosition()[0];
+                int hy = this.humenTanks[j].getCurrentPosition()[1];
+
+                if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50) {
+                    setCorrectDirection(this.computerTanks[i]);
+                    this.computerTanks[i].shot(root, this.computerTanks[i]);
+                    isShooted = true;
+                }
+            }
+
+        }
     }
 
 }
