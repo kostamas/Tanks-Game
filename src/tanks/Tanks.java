@@ -83,7 +83,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         gameController = new GameController(scene, computer);
         humen = new Humen(humenTanks[0], humenTanks, root, gameController);
 
-        gameController.turnHanlder(TankConst.HUMEN);
+        gameController.turnHanlder(TankConst.COMPUTER);
     }
 
     @Override

@@ -60,8 +60,7 @@ tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
       X3 is X-50, Y3 is Y+50,
      (collision(X1,Y1,PLAYER,Num, CTanks, HTanks), PosList1 = [],!          ;add_to_pos_list([X1,Y1,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1)),
      (collision(X2,Y2,PLAYER,Num, CTanks, HTanks), PosList2 = PosList1,! ;add_to_pos_list([X2,Y2,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2)),
-     (collision(X,Y,PLAYER,Num, CTanks, HTanks), PosList3 = PosList2,! ;add_to_pos_list([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3)),
-     (collision(X3,Y3,PLAYER,Num, CTanks, HTanks), PosList = PosList3,! ;add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList)).
+     (collision(X3,Y3,PLAYER,Num, CTanks, HTanks), PosList = PosList2,! ;add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList)).
 
 tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
      PLAYER = humen,!,
@@ -72,8 +71,8 @@ tank_moves([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList):-
       X5 is X,    Y5 is Y-50,
      (collision(X1,Y1,PLAYER,Num, CTanks, HTanks),PosList1 = [],!    ;add_to_pos_list([X1,Y1,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1)),
      (collision(X2,Y2,PLAYER,Num, CTanks, HTanks),PosList2 = PosList1,!   ;add_to_pos_list([X2,Y2,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2)),
-     (collision(X,Y,PLAYER,Num, CTanks, HTanks),PosList3 = PosList2,!   ;add_to_pos_list([X,Y,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3)),
-     (collision(X3,Y3,PLAYER,Num, CTanks, HTanks), PosList = PosList3,! ;add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList)).
+     (collision(X3,Y3,PLAYER,Num, CTanks, HTanks), PosList = PosList2,! ;add_to_pos_list([X3,Y3,L,Num], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList)).
+
 
 add_to_pos_list([X,Y,L,Num], [ [[_,_,_,Num]|CTanks], HTanks, PLAYER, AlphaBetaDepth], TempTanks, PosList,Result):-
     PLAYER = computer,!,
@@ -115,11 +114,10 @@ add_to_pos_list(_, _, _, PosList,PosList).
 
 
 shooting_handler(X,Y, [[X1,Y1,L1,Num]|Tanks],[[X1,Y1,L,Num]|Tanks1]):-
-    shooting_handler(X,Y, Tanks,Tanks1),
-    abs(X - X1,R1),abs(Y - Y1,R2),
-    (L is L1 - 1, R1 =< 50, R2 =< 50, !
-     ;
-     L  is L1).
+    (abs(X - X1,R1),abs(Y - Y1,R2),
+    (L is L1 - 1, Tanks1 = Tanks, R1 =< 50, R2 =< 50))
+    ;
+    (L is L1, shooting_handler(X,Y, Tanks,Tanks1)).
 
 shooting_handler(_,_,[],[]).
 
@@ -196,11 +194,27 @@ min_to_move([_,_,PLAYER,_]):-
 staticval([CTanks, HTanks,_,_],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
-     Val is ((CSum - HSum) * 10).
+     Val1 is ((CSum - HSum) * 10),
+     Val is Val1.
 
 
 
+distanc_eval([[X,Y,_,_]|CTanks],HTanks,Val):-
+    distanc_eval2([X,Y,_,_],HTanks,Val1),
+    distanc_eval(CTanks,HTanks,Val2),
+    Val is Val1 + Val2.
 
+distanc_eval2([X,Y,_,_],[[X1,Y1,_,_]|HTanks],Val):-
+    distanc_eval2([X,Y,_,_], HTanks, Val1),
+    abs(X-X1,R1),
+    abs(Y-Y1,R2),
+    (Val2 is -1, ((R1 = 100, R2 =< 100) ; (R2 = 100, R1 =< 100))
+        ;
+    Val2 is 0),
+    Val is Val1 + Val2.
+
+distanc_eval([],_,0).
+distanc_eval2(_,[],0).
 
 tanks_life_sum([[X,Y,Life,_]|Tanks],Sum):-
     tanks_life_sum(Tanks,Sum1),
@@ -213,6 +227,8 @@ manhattan_distance([X1,Y1],[X2,Y2],RES):-
     Y is Y1 - Y2,
    abs(X,PX),abs(Y,PY),
     RES is PX + PY.
+
+
 
 
 /*-------------------  evaluation function  --------------------*/

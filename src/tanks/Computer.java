@@ -157,7 +157,7 @@ public class Computer {
         String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer, 1]";
 
         String bestMoveQuery = "[CTanks,_,_,_]";
-        String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-99999, 99999," + bestMoveQuery + ", Val).";
+        String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-999999, 999999," + bestMoveQuery + ", Val).";
         Query bestMove = new Query(alphabetaQuery);
 
         Map<String, Term> solution = bestMove.oneSolution();
