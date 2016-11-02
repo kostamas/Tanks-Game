@@ -23,32 +23,25 @@ public class Tank extends Pane {
     int[] currentPosition;
     int currentDirection;
     int numOfDirections;
-    int tankLentgh;
-    String tankName;
-    String[] imagesDirections;
     String imagesPrefixPath;
     int[] startPosition;
+    StackPane root;
 
-    Tank(int x, int y, int initilizedDirection, int tankLentgh, String initilizedImagePath, String[] imagesDirections, String imagesPrefixPath, String tankName) {
+    Tank(int x, int y, int initilizedDirection, String initilizedImagePath, String imagesPrefixPath, StackPane root) {
         currentPosition = new int[2];
         startPosition = new int[2];
         startPosition[0] = x;
         startPosition[1] = y;
         setPosition(x, y, initilizedImagePath);
         this.currentDirection = initilizedDirection;
-        this.imagesDirections = imagesDirections;
         this.imagesPrefixPath = imagesPrefixPath;
-        this.tankLentgh = tankLentgh;
-        this.tankName = tankName;
+        this.root = root;
     }
 
     public int[] getCurrentPosition() {
         return this.currentPosition;
     }
 
-    public String getTankName() {
-        return this.tankName;
-    }
 
     public int[] getStartedPosition() {
         return this.startPosition;
@@ -63,10 +56,6 @@ public class Tank extends Pane {
         return this.currentDirection;
     }
 
-    public int getTankLength() {
-        return this.tankLentgh;
-    }
-
     public int getLife() {
         return this.life;
     }
@@ -76,8 +65,8 @@ public class Tank extends Pane {
         int wallLength = Walls.length;
 
         for (int i = 0; i < walls.length; i++) {
-            boolean XCollision = (x + this.tankLentgh >= walls[i][0] && x < walls[i][0] + wallLength);
-            boolean YCollision = (y + this.tankLentgh >= walls[i][1] && y < walls[i][1] + wallLength);
+            boolean XCollision = (x + TankConst.tankLength >= walls[i][0] && x < walls[i][0] + wallLength);
+            boolean YCollision = (y + TankConst.tankLength >= walls[i][1] && y < walls[i][1] + wallLength);
             if (XCollision && YCollision) {
                 return;
             }
@@ -86,14 +75,14 @@ public class Tank extends Pane {
     }
 
     public void turnRight() {
-        this.currentDirection = (this.currentDirection + 1) % imagesDirections.length;
-        String nextImage = this.imagesPrefixPath + imagesDirections[this.currentDirection] + ".png";
+        this.currentDirection = (this.currentDirection + 1) % TankConst.directions.length;
+        String nextImage = this.imagesPrefixPath + TankConst.directions[this.currentDirection] + ".png";
         setPosition(this.currentPosition[0], this.currentPosition[1], nextImage);
     }
 
     public void turnLeft() {
-        this.currentDirection = this.currentDirection > 0 ? this.currentDirection - 1 : imagesDirections.length - 1;
-        String nextImage = this.imagesPrefixPath + imagesDirections[this.currentDirection] + ".png";
+        this.currentDirection = this.currentDirection > 0 ? this.currentDirection - 1 : TankConst.directions.length - 1;
+        String nextImage = this.imagesPrefixPath + TankConst.directions[this.currentDirection] + ".png";
         setPosition(this.currentPosition[0], this.currentPosition[1], nextImage);
     }
 
@@ -132,10 +121,14 @@ public class Tank extends Pane {
         if (this.getLife() > 0) {
             updateLife(this.getLife() - 1);
         }
+
         ImageView hitImage = new ImageView("assets/tank_hit.png");
         getChildren().add(hitImage);
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(150), keyFrameFn -> animate(hitImage)));
         timeline.play();
+         if (this.getLife() <= 0) {
+            root.getChildren().remove(this);
+        }
     }
 
     private KeyFrame animate(ImageView hitImage) {

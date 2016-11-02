@@ -46,8 +46,8 @@ public class GameStatus {
             humneTanksText += "   tank " + (i + 1) + ": " + GameStatus.humenTanks[i].getLife();
         }
 
-        humenStatus = new Label("YOUR TANKS LIFE:" + computerTanksText);
-        computerStatus = new Label("COMPUTER TANKS LIFE:" + humneTanksText);
+        humenStatus = new Label("YOUR TANKS LIFE:" + humneTanksText);
+        computerStatus = new Label("COMPUTER TANKS LIFE:" + computerTanksText);
 
         humenStatus.setTextFill(Color.web("#48ff24"));
         humenStatus.setFont(new Font(15));
@@ -67,8 +67,8 @@ public class GameStatus {
         for (int i = 0; i < GameStatus.computerTanks.length; i++) {
             int tankXPosition = GameStatus.computerTanks[i].getCurrentPosition()[0];
             int tankYPosition = GameStatus.computerTanks[i].getCurrentPosition()[1];
-            boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + computerTanks[i].getTankLength());
-            boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + computerTanks[i].getTankLength());
+            boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + TankConst.tankLength);
+            boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + TankConst.tankLength);
             if (XCollision && YCollision && GameStatus.computerTanks[i] != shootingTank) {
                 handleTankHit(GameStatus.computerTanks[i]);
                 return true;
@@ -78,8 +78,8 @@ public class GameStatus {
         for (int i = 0; i < GameStatus.humenTanks.length; i++) {
             int tankXPosition = GameStatus.humenTanks[i].getCurrentPosition()[0];
             int tankYPosition = GameStatus.humenTanks[i].getCurrentPosition()[1];
-            boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + humenTanks[i].getTankLength());
-            boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + humenTanks[i].getTankLength());
+            boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + TankConst.tankLength);
+            boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + TankConst.tankLength);
             if (XCollision && YCollision && GameStatus.humenTanks[i] != shootingTank) {
                 handleTankHit(GameStatus.humenTanks[i]);
                 return true;

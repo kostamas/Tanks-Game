@@ -11,7 +11,6 @@ public class Humen {
     StackPane root;
     GameController gameController;
 
-
     public Humen(Tank activeTank, Tank[] humenTanks, StackPane root, GameController gameController) {
         this.activeTank = activeTank;
         this.humenTanks = humenTanks;
@@ -31,8 +30,8 @@ public class Humen {
         if (event.getCode() == KeyCode.DIGIT2) {
             activeTank = humenTanks[1];
         }
-        
-         if (event.getCode() == KeyCode.DIGIT3) {
+
+        if (event.getCode() == KeyCode.DIGIT3) {
             activeTank = humenTanks[2];
         }
 
@@ -44,11 +43,14 @@ public class Humen {
         }
 
         if (event.getCode() == KeyCode.UP) {
-            moveTank("tank1_", TankConst.tankMoveLength);
+            if (activeTank.getDirection() == 1 || activeTank.getDirection() == 2 || activeTank.getDirection() == 3) {
+                moveTank("tank1_", TankConst.tankMoveLength);
+            }
         }
-        if (event.getCode() == KeyCode.DOWN) {
-            moveTank("tank1_", -TankConst.tankMoveLength);
-        }
+        
+//        if (event.getCode() == KeyCode.DOWN) {  // no reveres.
+//            moveTank("tank1_", -TankConst.tankMoveLength);
+//        }
 
         if (event.getCode() == KeyCode.ENTER) {
             activeTank.setStartedPostion(activeTank.getCurrentPosition()[0], activeTank.getCurrentPosition()[1]);
@@ -71,14 +73,14 @@ public class Humen {
             activeTank.shot(root, activeTank);
         }
     }
-    
+
     private void moveTank(String tankName, int tankMoveDiff) {
         int x = activeTank.getCurrentPosition()[0];
         int y = activeTank.getCurrentPosition()[1];
         int startedX = activeTank.getStartedPosition()[0];
         int startedY = activeTank.getStartedPosition()[1];
         int maxDistance = TankConst.STEPS * TankConst.tankMoveLength;
-        
+
         int direction = activeTank.getDirection();
         if (direction != 0 && direction != 4) {
             x += (direction == 1 || direction == 2 || direction == 3) ? tankMoveDiff : -tankMoveDiff;

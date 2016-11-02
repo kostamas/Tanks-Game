@@ -130,23 +130,27 @@ public class Computer {
         String computerTanksPos = "";
         String humenTanksPos = "";
 
+        boolean firstTank = true;
         for (int i = 0; i < this.computerTanks.length; i++) {
             int computerX = computerTanks[i].getCurrentPosition()[0];
             int computerY = computerTanks[i].getCurrentPosition()[1];
             int computerLife = computerTanks[i].getLife();
             if (computerLife > 0) {
+                computerTanksPos += firstTank ? "" : ",";
                 computerTanksPos += "[" + computerX + "," + computerY + "," + computerLife + "," + (i + 1) + "]";
-                computerTanksPos += (i < this.computerTanks.length - 1) ? "," : "";
+                firstTank = false;
             }
         }
 
+        firstTank = true;
         for (int i = 0; i < this.humenTanks.length; i++) {
             int humenX = humenTanks[i].getCurrentPosition()[0];
             int humenY = humenTanks[i].getCurrentPosition()[1];
             int humenLife = humenTanks[i].getLife();
             if (humenLife > 0) {
+                humenTanksPos += firstTank ? "" : ",";
                 humenTanksPos += "[" + humenX + "," + humenY + "," + humenLife + "," + (i + 1) + "]";
-                humenTanksPos += (i < this.humenTanks.length - 1) ? "," : "";
+                firstTank = false;
             }
         }
 
@@ -188,8 +192,8 @@ public class Computer {
         int wallLength = Walls.length;
 
         for (int i = 0; i < walls.length; i++) {
-            boolean XCollision = (x + this.activeTank.tankLentgh >= walls[i][0] && x < walls[i][0] + wallLength);
-            boolean YCollision = (y + this.activeTank.tankLentgh >= walls[i][1] && y < walls[i][1] + wallLength);
+            boolean XCollision = (x + TankConst.tankLength >= walls[i][0] && x < walls[i][0] + wallLength);
+            boolean YCollision = (y + TankConst.tankLength >= walls[i][1] && y < walls[i][1] + wallLength);
             if (XCollision && YCollision) {
                 return true;
             }
@@ -206,7 +210,7 @@ public class Computer {
         for (int i = 0; i < this.humenTanks.length; i++) {
             int tmpX = this.humenTanks[i].getCurrentPosition()[0];
             int tmpY = this.humenTanks[i].getCurrentPosition()[1];
-            if (Math.abs(tmpX - cx) + Math.abs(tmpY - cy) < minDistance) {
+            if (Math.abs(tmpX - cx) + Math.abs(tmpY - cy) < minDistance && this.humenTanks[i].getLife() > 0) {
                 minDistance = Math.abs(tmpX - cx) + Math.abs(tmpY - cy);
                 hx = tmpX;
                 hy = tmpY;
@@ -253,7 +257,7 @@ public class Computer {
             int hx = this.humenTanks[i].getCurrentPosition()[0];
             int hy = this.humenTanks[i].getCurrentPosition()[1];
 
-            if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50) {
+            if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50 && this.humenTanks[i].getLife() > 0) {
                 this.activeTank.shot(root, this.activeTank);
                 break;
             }
@@ -270,7 +274,7 @@ public class Computer {
                 int hx = this.humenTanks[j].getCurrentPosition()[0];
                 int hy = this.humenTanks[j].getCurrentPosition()[1];
 
-                if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50) {
+                if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50 && this.humenTanks[j].getLife() > 0) {
                     setCorrectDirection(this.computerTanks[i]);
                     this.computerTanks[i].shot(root, this.computerTanks[i]);
                     isShooted = true;

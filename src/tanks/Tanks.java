@@ -46,14 +46,14 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         root.setBackground(new Background(myBI));
 
         Tank []humenTanks = new Tank[3];
-        humenTanks[0] = new Tank(300, 100, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-        humenTanks[1] = new Tank(350, 200, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
-        humenTanks[2] = new Tank(300, 300, 3, TankConst.tankLength, "assets/tank1_down_right.png", GameStatus.directions, "assets/tank1_", "Humen");
+        humenTanks[0] = new Tank(300, 100, 3, "assets/tank1_down_right.png", "assets/tank1_",root);
+        humenTanks[1] = new Tank(350, 200, 3, "assets/tank1_down_right.png", "assets/tank1_",root);
+        humenTanks[2] = new Tank(300, 300, 3, "assets/tank1_down_right.png", "assets/tank1_",root);
      
         Tank []computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(550,100, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        computerTanks[1] = new Tank(500,200, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
-        computerTanks[2] = new Tank(550,300, 7, TankConst.tankLength, "assets/tank2_up_left.png", GameStatus.directions, "assets/tank2_", "Computer");
+        computerTanks[0] = new Tank(550,100, 7, "assets/tank2_up_left.png", "assets/tank2_",root);
+        computerTanks[1] = new Tank(500,200, 7, "assets/tank2_up_left.png", "assets/tank2_",root);
+        computerTanks[2] = new Tank(550,300, 7, "assets/tank2_up_left.png", "assets/tank2_",root);
 
         
         root.getChildren().add(computerTanks[0]);
