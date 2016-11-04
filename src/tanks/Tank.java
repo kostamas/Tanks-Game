@@ -23,16 +23,20 @@ public class Tank extends Pane {
     int[] currentPosition;
     int currentDirection;
     int numOfDirections;
+    int tankNumber;
     String imagesPrefixPath;
     int[] startPosition;
     StackPane root;
+    int power;
 
-    Tank(int x, int y, int initilizedDirection, String initilizedImagePath, String imagesPrefixPath, StackPane root) {
+    Tank(int x, int y, int initilizedDirection, int power, int tankNumber, String initilizedImagePath, String imagesPrefixPath, StackPane root) {
         currentPosition = new int[2];
         startPosition = new int[2];
         startPosition[0] = x;
         startPosition[1] = y;
         setPosition(x, y, initilizedImagePath);
+        this.power = power;
+        this.tankNumber = tankNumber;
         this.currentDirection = initilizedDirection;
         this.imagesPrefixPath = imagesPrefixPath;
         this.root = root;
@@ -41,7 +45,6 @@ public class Tank extends Pane {
     public int[] getCurrentPosition() {
         return this.currentPosition;
     }
-
 
     public int[] getStartedPosition() {
         return this.startPosition;
@@ -60,6 +63,14 @@ public class Tank extends Pane {
         return this.life;
     }
 
+    public int getPower() {
+        return this.power;
+    }
+    
+     public int getTankNumber() {
+        return this.tankNumber;
+    }
+
     public void move(int x, int y, String imgPath) {
         int[][] walls = Walls.walls;
         int wallLength = Walls.length;
@@ -76,13 +87,13 @@ public class Tank extends Pane {
 
     public void turnRight() {
         this.currentDirection = (this.currentDirection + 1) % TankConst.directions.length;
-        String nextImage = this.imagesPrefixPath + TankConst.directions[this.currentDirection] + ".png";
+        String nextImage = this.imagesPrefixPath + TankConst.directions[this.currentDirection] + tankNumber + ".png";
         setPosition(this.currentPosition[0], this.currentPosition[1], nextImage);
     }
 
     public void turnLeft() {
         this.currentDirection = this.currentDirection > 0 ? this.currentDirection - 1 : TankConst.directions.length - 1;
-        String nextImage = this.imagesPrefixPath + TankConst.directions[this.currentDirection] + ".png";
+        String nextImage = this.imagesPrefixPath + TankConst.directions[this.currentDirection] + tankNumber + ".png";
         setPosition(this.currentPosition[0], this.currentPosition[1], nextImage);
     }
 
@@ -96,7 +107,7 @@ public class Tank extends Pane {
         this.currentPosition[1] = y;
     }
 
-    public void shot(StackPane root, Tank shootingTank) {
+    public void shot(StackPane root, Tank shootingTank, int power) {
         int direction = shootingTank.getDirection();
         int x = shootingTank.getCurrentPosition()[0] + TankConst.bulletOffsetByDirection[direction][0];
         int y = shootingTank.getCurrentPosition()[1] + TankConst.bulletOffsetByDirection[direction][1];
@@ -110,23 +121,23 @@ public class Tank extends Pane {
             nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
         }
         Bullet bullet = new Bullet("assets/green_bullet.png", this, 16, root, 10);
-        bullet.fly(x, y, nextX, nextY, root);
+        bullet.fly(x, y, nextX, nextY, root, power);
     }
 
     public void updateLife(int newLife) {
         this.life = newLife;
     }
 
-    public void hitted() {
+    public void hitted(int power) {
         if (this.getLife() > 0) {
-            updateLife(this.getLife() - 1);
+            updateLife(this.getLife() - power);
         }
 
         ImageView hitImage = new ImageView("assets/tank_hit.png");
         getChildren().add(hitImage);
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(150), keyFrameFn -> animate(hitImage)));
         timeline.play();
-         if (this.getLife() <= 0) {
+        if (this.getLife() <= 0) {
             root.getChildren().remove(this);
         }
     }

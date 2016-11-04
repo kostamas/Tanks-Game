@@ -45,24 +45,23 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
-        Tank []humenTanks = new Tank[3];
-        humenTanks[0] = new Tank(300, 100, 3, "assets/tank1_down_right.png", "assets/tank1_",root);
-        humenTanks[1] = new Tank(350, 200, 3, "assets/tank1_down_right.png", "assets/tank1_",root);
-        humenTanks[2] = new Tank(300, 300, 3, "assets/tank1_down_right.png", "assets/tank1_",root);
-     
-        Tank []computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(550,100, 7, "assets/tank2_up_left.png", "assets/tank2_",root);
-        computerTanks[1] = new Tank(500,200, 7, "assets/tank2_up_left.png", "assets/tank2_",root);
-        computerTanks[2] = new Tank(550,300, 7, "assets/tank2_up_left.png", "assets/tank2_",root);
+        Tank[] humenTanks = new Tank[3];
+        humenTanks[0] = new Tank(300, 100, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
+        humenTanks[1] = new Tank(350, 200, 3, 3, 2, "assets/tank1_down_right2.png", "assets/tank1_", root);
+        humenTanks[2] = new Tank(300, 300, 3, 5, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
 
-        
+        Tank[] computerTanks = new Tank[3];
+        computerTanks[0] = new Tank(550, 100, 7, 5, 3, "assets/tank2_left3.png", "assets/tank2_", root);
+        computerTanks[1] = new Tank(500, 200, 7, 3, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
+        computerTanks[2] = new Tank(550, 300, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
+
         root.getChildren().add(computerTanks[0]);
         root.getChildren().add(computerTanks[1]);
         root.getChildren().add(computerTanks[2]);
+
         root.getChildren().add(humenTanks[0]);
         root.getChildren().add(humenTanks[1]);
         root.getChildren().add(humenTanks[2]);
-
 
         Walls walls = new Walls(50, "assets/wall.png");
         root.getChildren().add(walls);
@@ -91,7 +90,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         this.tilePane = null;
         humen.eventHanlder(event);
     }
-    
+
     private void drawShapes(GraphicsContext gc) {
         gc.setLineWidth(0.3);
 

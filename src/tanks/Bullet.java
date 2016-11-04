@@ -35,7 +35,7 @@ public class Bullet extends Pane {
         this.shootingTank = shootingTank;
     }
 
-    public void fly(int x, int y, int nextX, int nextY, StackPane root) {
+    public void fly(int x, int y, int nextX, int nextY, StackPane root, int power) {
         if (timeline != null && (timeline.getStatus().compareTo(Animation.Status.STOPPED) != 0)) {
             return;
         }
@@ -49,13 +49,13 @@ public class Bullet extends Pane {
         this.nextX = nextX;
         this.nextY = nextY;
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(this.animationDuration), keyFrameFn -> animate()));
+        timeline = new Timeline(new KeyFrame(Duration.millis(this.animationDuration), keyFrameFn -> animate(power)));
         timeline.setCycleCount(cycleCount);
 
         timeline.play();
     }
 
-    private KeyFrame animate() {
+    private KeyFrame animate(int power) {
         count++;
         getChildren().remove(image); // remove bullet image from the bullet pane.
         x += nextX;
@@ -74,7 +74,7 @@ public class Bullet extends Pane {
         setTranslateY(y);
         image = new ImageView(new javafx.scene.image.Image(imgPath));
         getChildren().add(image);
-        boolean wasHit = GameStatus.checkIfTankeHit(x, y, this.bulletLength, this.shootingTank);
+        boolean wasHit = GameStatus.checkIfTankeHit(x, y, this.bulletLength, this.shootingTank, power);
         if (count >= cycleCount || wasHit) {
             timeline.stop();
             getChildren().remove(image);

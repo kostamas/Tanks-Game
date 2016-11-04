@@ -70,7 +70,7 @@ public class Humen {
             if (direction != 2 && direction != 6) {
                 nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
             }
-            activeTank.shot(root, activeTank);
+            activeTank.shot(root, activeTank, activeTank.getPower());
         }
     }
 
@@ -90,7 +90,7 @@ public class Humen {
         }
 
         if (Math.abs(x - startedX) <= maxDistance && Math.abs(y - startedY) <= maxDistance) {
-            activeTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + ".png");
+            activeTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + activeTank.getTankNumber() + ".png");
         }
     }
 

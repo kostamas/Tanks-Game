@@ -34,20 +34,20 @@ public class Computer {
 
     public void play() {
         int[] nextMove = new int[2];
-        int nextX, nextY, shootX,shootY;
-        int []queryResult;
+        int nextX, nextY, shootX, shootY;
+        int[] queryResult;
         queryResult = askForNextMove();
         nextX = queryResult[0];
         nextY = queryResult[1];
         shootX = queryResult[2];
         shootY = queryResult[3];
-        
+
         if (nextX > 0 && nextY > 0) {
-            timeline = new Timeline(new KeyFrame(Duration.millis(450), keyFrameFn -> animate(nextX, nextY,shootX,shootY)));
+            timeline = new Timeline(new KeyFrame(Duration.millis(450), keyFrameFn -> animate(nextX, nextY, shootX, shootY)));
             timeline.setCycleCount(1);
             timeline.play();
         } else {
-            generalShootingHandler(shootX,shootY);
+            generalShootingHandler(shootX, shootY);
             GameController.setActivePlayer(TankConst.HUMEN);
         }
     }
@@ -55,16 +55,16 @@ public class Computer {
     private KeyFrame animate(int nextX, int nextY, int shootX, int shootY) {
         moveTank(nextX, nextY);
         Timeline timelineTurn = timeline;
-        timelineTurn = new Timeline(new KeyFrame(Duration.millis(250), keyFrameFn -> animateTurn(shootX,shootY)));
+        timelineTurn = new Timeline(new KeyFrame(Duration.millis(250), keyFrameFn -> animateTurn(shootX, shootY)));
         timelineTurn.setCycleCount(1);
         timelineTurn.play();
 
         return null;
     }
 
-    private KeyFrame animateTurn( int shootX, int shootY) {
+    private KeyFrame animateTurn(int shootX, int shootY) {
         setCorrectDirection(this.activeTank, -1, -1);
-        shootingHandler(shootX,shootY);
+        shootingHandler(shootX, shootY);
         GameController.setActivePlayer(TankConst.HUMEN);
         return null;
     }
@@ -79,7 +79,7 @@ public class Computer {
         }
 
         if (currentDirection == nextMoveDirection) {
-            activeTank.move(nextX, nextY, "assets/tank2_" + GameStatus.directions[nextMoveDirection] + ".png");
+            activeTank.move(nextX, nextY, "assets/tank2_" + GameStatus.directions[nextMoveDirection] + activeTank.getTankNumber() + ".png");
         } else {
             calcTurn(currentDirection, nextMoveDirection, activeTank);
             moveTank(nextX, nextY);
@@ -138,9 +138,11 @@ public class Computer {
             int computerX = computerTanks[i].getCurrentPosition()[0];
             int computerY = computerTanks[i].getCurrentPosition()[1];
             int computerLife = computerTanks[i].getLife();
+            int computerPower = computerTanks[i].getPower();
+
             if (computerLife > 0) {
                 computerTanksPos += firstTank ? "" : ",";
-                computerTanksPos += "[" + computerX + "," + computerY + "," + computerLife + "," + (i + 1) + "]";
+                computerTanksPos += "[" + computerX + "," + computerY + "," + computerLife + "," + (i + 1) + "," + computerPower + "]";
                 firstTank = false;
             }
         }
@@ -150,9 +152,11 @@ public class Computer {
             int humenX = humenTanks[i].getCurrentPosition()[0];
             int humenY = humenTanks[i].getCurrentPosition()[1];
             int humenLife = humenTanks[i].getLife();
+            int humenPower = humenTanks[i].getPower();
+
             if (humenLife > 0) {
                 humenTanksPos += firstTank ? "" : ",";
-                humenTanksPos += "[" + humenX + "," + humenY + "," + humenLife + "," + (i + 1) + "]";
+                humenTanksPos += "[" + humenX + "," + humenY + "," + humenLife + "," + (i + 1) + "," + humenPower + "]";
                 firstTank = false;
             }
         }
@@ -270,8 +274,8 @@ public class Computer {
             int hx = this.humenTanks[i].getCurrentPosition()[0];
             int hy = this.humenTanks[i].getCurrentPosition()[1];
 
-            if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50 && this.humenTanks[i].getLife() > 0) {
-                this.activeTank.shot(root, this.activeTank);
+            if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50 && this.humenTanks[i].getLife() > 0 && activeTank.getLife() > 0) {
+                this.activeTank.shot(root, this.activeTank, activeTank.getPower());
                 break;
             }
         }
@@ -287,9 +291,9 @@ public class Computer {
                 int hx = this.humenTanks[j].getCurrentPosition()[0];
                 int hy = this.humenTanks[j].getCurrentPosition()[1];
 
-                if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50 && this.humenTanks[j].getLife() > 0) {
-                    setCorrectDirection(this.computerTanks[i],shootX,shootY);
-                    this.computerTanks[i].shot(root, this.computerTanks[i]);
+                if (Math.abs(cx - hx) <= 50 && Math.abs(cy - hy) <= 50 && this.humenTanks[j].getLife() > 0 && this.computerTanks[i].getLife() > 0) {
+                    setCorrectDirection(this.computerTanks[i], shootX, shootY);
+                    this.computerTanks[i].shot(root, this.computerTanks[i], this.computerTanks[i].power);
                     isShooted = true;
                 }
             }

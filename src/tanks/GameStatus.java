@@ -63,14 +63,14 @@ public class GameStatus {
         root.getChildren().add(humenStatus);
     }
 
-    public static boolean checkIfTankeHit(int bulletXPosition, int bulletYPosition, int bulletLength, Tank shootingTank) {
+    public static boolean checkIfTankeHit(int bulletXPosition, int bulletYPosition, int bulletLength, Tank shootingTank, int power) {
         for (int i = 0; i < GameStatus.computerTanks.length; i++) {
             int tankXPosition = GameStatus.computerTanks[i].getCurrentPosition()[0];
             int tankYPosition = GameStatus.computerTanks[i].getCurrentPosition()[1];
             boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + TankConst.tankLength);
             boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + TankConst.tankLength);
             if (XCollision && YCollision && GameStatus.computerTanks[i] != shootingTank) {
-                handleTankHit(GameStatus.computerTanks[i]);
+                handleTankHit(GameStatus.computerTanks[i], power);
                 return true;
             }
         }
@@ -81,7 +81,7 @@ public class GameStatus {
             boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + TankConst.tankLength);
             boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + TankConst.tankLength);
             if (XCollision && YCollision && GameStatus.humenTanks[i] != shootingTank) {
-                handleTankHit(GameStatus.humenTanks[i]);
+                handleTankHit(GameStatus.humenTanks[i], power);
                 return true;
             }
         }
@@ -89,8 +89,8 @@ public class GameStatus {
         return false;
     }
 
-    public static void handleTankHit(Tank tank) {
-        tank.hitted();
+    public static void handleTankHit(Tank tank, int power) {
+        tank.hitted(power);
         updateText();
 
         boolean isComputerLost = true, isHumenLost = true;
