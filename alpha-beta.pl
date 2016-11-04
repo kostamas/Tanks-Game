@@ -125,7 +125,7 @@ collision(X,Y,Player,Num,CTanks, HTanks):-
 collision2(X,Y,Player1,Player2,Num,[[X1,Y1,_,Num1,_]|Tanks]):-
     (X = X1, Y = Y1, (Num \= Num1,! ; Player1 \= Player2))
     ;
-    (X < 100,! ; X > 750,! ;  Y < 50,! ; Y > 500) /*game borders*/
+    (X < 100,! ; X > 750,! ;  Y < 50,! ; Y > 400) /*game borders*/
     ;                              
     collision2(X,Y,Player1,Player2,Num,Tanks).
 

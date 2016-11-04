@@ -46,13 +46,13 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         root.setBackground(new Background(myBI));
 
         Tank[] humenTanks = new Tank[3];
-        humenTanks[0] = new Tank(300, 100, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
+        humenTanks[0] = new Tank(300, 50, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
         humenTanks[1] = new Tank(350, 200, 3, 3, 2, "assets/tank1_down_right2.png", "assets/tank1_", root);
         humenTanks[2] = new Tank(300, 300, 3, 5, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
 
         Tank[] computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(550, 100, 7, 5, 3, "assets/tank2_left3.png", "assets/tank2_", root);
-        computerTanks[1] = new Tank(500, 200, 7, 3, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
+        computerTanks[0] = new Tank(550, 50, 7, 5, 3, "assets/tank2_left3.png", "assets/tank2_", root);
+        computerTanks[1] = new Tank(500, 150, 7, 3, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
         computerTanks[2] = new Tank(550, 300, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
 
         root.getChildren().add(computerTanks[0]);
@@ -65,7 +65,7 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
         Walls walls = new Walls(50, "assets/wall.png");
         root.getChildren().add(walls);
-        Scene scene = new Scene(root, 800, 500);
+        Scene scene = new Scene(root, 800, 400);
         scene.setOnKeyPressed(this);
 
         primaryStage.setScene(scene);

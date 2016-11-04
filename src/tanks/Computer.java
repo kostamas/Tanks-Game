@@ -170,6 +170,7 @@ public class Computer {
         Map<String, Term> solution = bestMove.oneSolution();
 
         int[] result = new int[4];
+        result[0] = result[1] = -1;
         int bestMoveTankNum, shootX, shootY;
         String shoot;
         Term[] terms = solution.get("CTanks").toTermArray();
