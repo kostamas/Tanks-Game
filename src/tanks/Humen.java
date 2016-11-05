@@ -34,6 +34,10 @@ public class Humen {
         if (event.getCode() == KeyCode.DIGIT3) {
             activeTank = humenTanks[2];
         }
+        
+         if (event.getCode() == KeyCode.DIGIT4) {
+            activeTank = humenTanks[3];
+        }
 
         if (event.getCode() == KeyCode.RIGHT) {
             activeTank.turnRight();
