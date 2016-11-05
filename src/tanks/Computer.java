@@ -161,9 +161,9 @@ public class Computer {
             }
         }
 
-        String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer, 1,_,_]";
+        String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer, 1,_,_,_]";
 
-        String bestMoveQuery = "[CTanks,_,_,_,XS,YS]";
+        String bestMoveQuery = "[CTanks,_,_,_,XS,YS,Hit]";
         String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-999999, 999999," + bestMoveQuery + ", Val).";
         Query bestMove = new Query(alphabetaQuery);
 
@@ -220,7 +220,7 @@ public class Computer {
 
         int hx = 0, hy = 0;
         int minDistance = 100000;
-        if (shootX != -1 && shootY != -1) {
+        if (shootX == -1 || shootY == -1) {
             for (int i = 0; i < this.humenTanks.length; i++) {
                 int tmpX = this.humenTanks[i].getCurrentPosition()[0];
                 int tmpY = this.humenTanks[i].getCurrentPosition()[1];

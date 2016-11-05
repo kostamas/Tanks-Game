@@ -10,11 +10,11 @@ alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
 /* ------------ const values  --------------- */
 
 
-moves([_,_,_, AlphaBetaDepth,_,_], _):-
+moves([_,_,_, AlphaBetaDepth,_,_,_], _):-
     alpha_beta_depth(Depth),
     AlphaBetaDepth == Depth,!,fail.
 
-moves([CTanks, HTanks, PLAYER, AlphaBetaDepth,_,_], PosList):-
+moves([CTanks, HTanks, PLAYER, AlphaBetaDepth,_,_,_], PosList):-
     AlphaBetaDepth2 is AlphaBetaDepth + 1,
     (
        PLAYER = computer, next_moves(CTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList),!; 
@@ -36,11 +36,7 @@ tank_moves([X,Y,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList)
       X1 is X-50, Y1 is Y, 
       X2 is X-50, Y2 is Y-50,
       X3 is X-50, Y3 is Y+50,
-     ((can_stay_in_place(X,Y, HTanks), add_to_pos_list([X,Y,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1))
-        ;
-        PosList1 = []
-     ),
-     (collision(X1,Y1,PLAYER,Num, CTanks, HTanks), PosList2 = PosList1,!          ;add_to_pos_list([X1,Y1,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2)),
+     (collision(X1,Y1,PLAYER,Num, CTanks, HTanks), PosList2 = [],!          ;add_to_pos_list([X1,Y1,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList2)),
      (collision(X2,Y2,PLAYER,Num, CTanks, HTanks), PosList3 = PosList2,! ;add_to_pos_list([X2,Y2,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3)),
      (collision(X3,Y3,PLAYER,Num, CTanks, HTanks), PosList = PosList3,! ;add_to_pos_list([X3,Y3,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList)).
      
@@ -50,11 +46,7 @@ tank_moves([X,Y,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], PosList)
       X1 is X+50, Y1 is Y, 
       X2 is X+50, Y2 is Y-50,
       X3 is X+50, Y3 is Y+50,
-      ((can_stay_in_place(X,Y, CTanks), add_to_pos_list([X,Y,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList1))
-        ;
-        PosList1 = []
-      ),
-     (collision(X1,Y1,PLAYER,Num, CTanks, HTanks),PosList2 = PosList1,!    ;add_to_pos_list([X1,Y1,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList1, PosList2)),
+     (collision(X1,Y1,PLAYER,Num, CTanks, HTanks),PosList2 = [],!    ;add_to_pos_list([X1,Y1,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], [], PosList2)),
      (collision(X2,Y2,PLAYER,Num, CTanks, HTanks),PosList3 = PosList2,!   ;add_to_pos_list([X2,Y2,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList2, PosList3)),
      (collision(X3,Y3,PLAYER,Num, CTanks, HTanks), PosList = PosList3,! ;add_to_pos_list([X3,Y3,L,Num,Power], [CTanks, HTanks, PLAYER, AlphaBetaDepth], [], PosList3, PosList)).
    
@@ -87,15 +79,15 @@ add_to_pos_list(_, _, _, PosList,PosList).
     PLAYER = computer,!,
     append(TempTanks, [[X1,Y1,CL1,Num,Power]], HeadCTanks),
     append(HeadCTanks, RestCTanks, CTanks),
-    shooting_handler(X1, Y1,Power,  HTanks, HTanks1,XS,YS),
-    Pos = [CTanks, HTanks1, humen, AlphaBetaDepth,XS,YS].
+    shooting_handler(X1, Y1,Power,  HTanks, HTanks1,XS,YS,Hit),
+    Pos = [CTanks, HTanks1, humen, AlphaBetaDepth,XS,YS,Hit].
 
  build_Pos([X1,Y1,CL1,Num,Power],TempTanks, CTanks, RestHTanks, PLAYER, AlphaBetaDepth,Pos):-
     PLAYER = humen,!,
     append(TempTanks, [[X1,Y1,CL1,Num,Power]], HeadHTanks),
     append(HeadHTanks, RestHTanks, HTanks),
-    shooting_handler(X1, Y1, Power, CTanks, CTanks1,XS,YS),
-    Pos = [CTanks1, HTanks, computer, AlphaBetaDepth,XS,YS].
+    shooting_handler(X1, Y1, Power, CTanks, CTanks1,XS,YS,Hit),
+    Pos = [CTanks1, HTanks, computer, AlphaBetaDepth,XS,YS,Hit].
 
 can_stay_in_place(X,Y, [[X1,Y1,_,_,_]|Tanks]):-
      (abs(X - X1,R1),abs(Y - Y1,R2),
@@ -106,13 +98,13 @@ can_stay_in_place(X,Y, [[X1,Y1,_,_,_]|Tanks]):-
       
 can_stay_in_place(_,_,[]):-fail.
 
-shooting_handler(X,Y,Power, [[X1,Y1,L1,Num1,Power1]|Tanks],[[X1,Y1,L,Num1,Power1]|Tanks1],XS,YS):-
+shooting_handler(X,Y,Power, [[X1,Y1,L1,Num1,Power1]|Tanks],[[X1,Y1,L,Num1,Power1]|Tanks1],XS,YS,Hit):-
     (abs(X - X1,R1),abs(Y - Y1,R2),
-    (L is (L1 - Power), Tanks1 = Tanks, XS is X1, YS is Y1, R1 =< 50, R2 =< 50))
+    (L is (L1 - Power), Tanks1 = Tanks, XS is X1, YS is Y1, Hit is Power, R1 =< 50, R2 =< 50))
     ;
-    (L is L1, shooting_handler(X,Y,Power, Tanks,Tanks1,XS,YS)).
+    (L is L1, shooting_handler(X,Y,Power, Tanks,Tanks1,XS,YS,Hit)).
 
-shooting_handler(_,_,_,[],[],-1,-1).
+shooting_handler(_,_,_,[],[],-1,-1,-1).
 
      
 collision(X,Y,Player,Num,CTanks, HTanks):-
@@ -125,7 +117,7 @@ collision(X,Y,Player,Num,CTanks, HTanks):-
 collision2(X,Y,Player1,Player2,Num,[[X1,Y1,_,Num1,_]|Tanks]):-
     (X = X1, Y = Y1, (Num \= Num1,! ; Player1 \= Player2))
     ;
-    (X < 100,! ; X > 750,! ;  Y < 50,! ; Y > 400) /*game borders*/
+    (X < 100,! ; X > 750,! ;  Y < 50,! ; Y > 300) /*game borders*/
     ;                              
     collision2(X,Y,Player1,Player2,Num,Tanks).
 
@@ -171,9 +163,9 @@ betterof(Pos, Val, Pos1, Val1, Pos, Val):-
 betterof(_,_,Pos1,Val1,Pos1,Val1).
 
 
-min_to_move([_,_,PLAYER,_,_,_]):-
+min_to_move([_,_,PLAYER,_,_,_,_]):-
     PLAYER = humen.
- max_to_move([_,_,PLAYER,_,_,_]):-
+ max_to_move([_,_,PLAYER,_,_,_,_]):-
     PLAYER = computer.
 
 /* ------------------ alpha beta algorithm ------------------*/
@@ -184,13 +176,16 @@ min_to_move([_,_,PLAYER,_,_,_]):-
 
 /*-------------------  evaluation function  --------------------*/
 
-staticval([CTanks, HTanks,_,_,_,_],Val):-
+staticval([CTanks, HTanks,_,_,_,_,Hit],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
-     Val1 is ((CSum - HSum) * 10),
-     Val is Val1.
+     Val is (CSum-HSum)*2.
+     
 
-
+#     Val1 is (CSum-HSum),
+#(Val1 is 100, R is CSum - HSum, R > 0 
+#        ;
+#     Val1 is 0),
 
 distanc_eval([[X,Y,_,_,_]|CTanks],HTanks,Val):-
     distanc_eval2([X,Y,_,_,_],HTanks,Val1),

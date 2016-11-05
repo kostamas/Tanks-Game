@@ -45,27 +45,27 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
-        Tank[] humenTanks = new Tank[3];
-        humenTanks[0] = new Tank(300, 50, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
-        humenTanks[1] = new Tank(350, 200, 3, 3, 2, "assets/tank1_down_right2.png", "assets/tank1_", root);
-        humenTanks[2] = new Tank(300, 300, 3, 5, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
+        Tank[] humenTanks = new Tank[2];
+//        humenTanks[0] = new Tank(250, 100, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
+        humenTanks[0] = new Tank(250, 150, 3, 2, 2, "assets/tank1_down_right2.png", "assets/tank1_", root);
+        humenTanks[1] = new Tank(250, 200, 3, 3, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
 
-        Tank[] computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(550, 50, 7, 5, 3, "assets/tank2_left3.png", "assets/tank2_", root);
-        computerTanks[1] = new Tank(500, 150, 7, 3, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
-        computerTanks[2] = new Tank(550, 300, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
+        Tank[] computerTanks = new Tank[1];
+        computerTanks[0] = new Tank(450, 100, 7, 3, 3, "assets/tank2_left3.png", "assets/tank2_", root);
+//        computerTanks[1] = new Tank(450, 150, 7, 2, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
+//        computerTanks[2] = new Tank(450, 200, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
 
         root.getChildren().add(computerTanks[0]);
-        root.getChildren().add(computerTanks[1]);
-        root.getChildren().add(computerTanks[2]);
+//        root.getChildren().add(computerTanks[1]);
+//        root.getChildren().add(computerTanks[2]);
 
         root.getChildren().add(humenTanks[0]);
         root.getChildren().add(humenTanks[1]);
-        root.getChildren().add(humenTanks[2]);
+//        root.getChildren().add(humenTanks[2]);
 
         Walls walls = new Walls(50, "assets/wall.png");
         root.getChildren().add(walls);
-        Scene scene = new Scene(root, 800, 400);
+        Scene scene = new Scene(root, 800, 350);
         scene.setOnKeyPressed(this);
 
         primaryStage.setScene(scene);
@@ -96,13 +96,13 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
         // vertical lines
         gc.setStroke(Color.BLUE);
-        for (int x = 50; x < 1300; x += 50) {
+        for (int x = 0; x < 1050; x += 50) {
             gc.strokeLine(x, 50, x, 550);
         }
 
         //  horizontal lines
         gc.setStroke(Color.RED);
-        for (int y = 50; y < 700; y += 50) {
+        for (int y = 25; y < 400; y += 50) {
             gc.strokeLine(50, y, 1250, y);
         }
 
