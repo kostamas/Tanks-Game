@@ -120,7 +120,7 @@ public class Tank extends Pane {
         if (direction != 2 && direction != 6) {
             nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
         }
-        Bullet bullet = new Bullet("assets/green_bullet.png", this, 16, root, 10);
+        Bullet bullet = new Bullet("assets/green_bullet.png", this, 4, root, 10);
         bullet.fly(x, y, nextX, nextY, root, power);
     }
 
