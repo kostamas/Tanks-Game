@@ -100,7 +100,7 @@ add_to_pos_list(_, _, _, PosList,PosList).
     (Positions1 = [], 
      append(TempTanks, [[X1,Y1,CL1,Num,Power]], HeadHTanks),
      append(HeadHTanks, RestHTanks, HTanks),
-     Positions = [[CTanks, HTanks, humen, AlphaBetaDepth,[-1,-1,-1,-1,0],[X1,Y1,CL1,Num,Power]]]
+     Positions = [[CTanks, HTanks, computer, AlphaBetaDepth,[-1,-1,-1,-1,0],[X1,Y1,CL1,Num,Power]]]
      ;
      Positions = Positions1).
 
@@ -229,7 +229,7 @@ min_to_move([_,_,PLAYER,_,_,_]):-
 
 /*-------------------  evaluation function  --------------------*/
 
-staticval([CTanks, HTanks,_,_,ActiveCTank,HTankToShoot],Val):-
+staticval([CTanks, HTanks,_,_,ActiveCTank,HumenTankToShoot],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
      humen-life-eval(HTanks,Val1),
@@ -241,13 +241,13 @@ staticval([CTanks, HTanks,_,_,ActiveCTank,HTankToShoot],Val):-
 humen-life-eval(HTanks,Val):-
     humen-life-combination(HTanks, CodeCombination),
     (Val is 50, CodeCombination is 1,!;     /*tank with power 1 is out*/
-    Val is 60, CodeCombination is 4,!;     /*tank with power 2 is out*/
-    Val is 70, CodeCombination is 9,!;     /*tank with power 3 is out*/
-    Val is 80, CodeCombination is 5,!;      /*tank with power 1 + tank with power 2 is out*/
-    Val is 90, CodeCombination is 10,!;    /*tank with power 1 + tank with power 3 is out is out*/
-    Val is 100, CodeCombination is 13,!;    /*tank with power 2 + tank with power 3 is outis out*/
-    Val is 120, CodeCombination is 14,!;    /*all tanks is out*/
-    Val is 0).                              /*no tank out*/
+     Val is 60, CodeCombination is 4,!;     /*tank with power 2 is out*/
+     Val is 70, CodeCombination is 9,!;     /*tank with power 3 is out*/
+     Val is 80, CodeCombination is 5,!;      /*tank with power 1 + tank with power 2 is out*/
+     Val is 90, CodeCombination is 10,!;    /*tank with power 1 + tank with power 3 is out is out*/
+     Val is 100, CodeCombination is 13,!;    /*tank with power 2 + tank with power 3 is outis out*/
+     Val is 120, CodeCombination is 14,!;    /*all tanks is out*/
+     Val is 0).                              /*no tank out*/
 
 
 humen-life-combination([[_,_,Life,_,Power]|HTanks],CodeCombination):-
