@@ -51,9 +51,9 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         humenTanks[2] = new Tank(250, 200, 3, 3, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
 
         Tank[] computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(500, 100, 7, 3, 3, "assets/tank2_left3.png", "assets/tank2_", root);
-        computerTanks[1] = new Tank(500, 150, 7, 2, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
-        computerTanks[2] = new Tank(500, 200, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
+        computerTanks[0] = new Tank(450, 100, 7, 3, 3, "assets/tank2_left3.png", "assets/tank2_", root);
+        computerTanks[1] = new Tank(450, 150, 7, 2, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
+        computerTanks[2] = new Tank(450, 200, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
 
         root.getChildren().add(computerTanks[0]);
         root.getChildren().add(computerTanks[1]);

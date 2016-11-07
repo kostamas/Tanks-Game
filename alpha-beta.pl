@@ -229,26 +229,25 @@ min_to_move([_,_,PLAYER,_,_,_]):-
 
 /*-------------------  evaluation function  --------------------*/
 
-staticval([CTanks, HTanks,_,_,ActiveCTank,HTank1],Val):-
+staticval([CTanks, HTanks,_,_,ActiveCTank,HTankToShoot],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
      humen-life-eval(HTanks,Val1),
-     Val2 is CSum-HSum,
+     Val2 is (CSum-HSum)*2,
      Val is Val1 + Val2.
      
      
 
 humen-life-eval(HTanks,Val):-
     humen-life-combination(HTanks, CodeCombination),
-    Val is 10, CodeCombination is 1,!;     /*tank with power 1 is out*/
-    Val is 20, CodeCombination is 4,!;     /*tank with power 2 is out*/
-    Val is 30, CodeCombination is 9,!;     /*tank with power 3 is out*/
-    Val is 40, CodeCombination is 5,!;      /*tank with power 1 + tank with power 2 is out*/
-    Val is 50, CodeCombination is 10,!;    /*tank with power 1 + tank with power 3 is out is out*/
-    Val is 60, CodeCombination is 13,!;    /*tank with power 2 + tank with power 3 is outis out*/
-    Val is 70, CodeCombination is 14,!;    /*all tanks is out*/
-    Val is 0.                              /*no tank out*/
-
+    (Val is 50, CodeCombination is 1,!;     /*tank with power 1 is out*/
+    Val is 60, CodeCombination is 4,!;     /*tank with power 2 is out*/
+    Val is 70, CodeCombination is 9,!;     /*tank with power 3 is out*/
+    Val is 80, CodeCombination is 5,!;      /*tank with power 1 + tank with power 2 is out*/
+    Val is 90, CodeCombination is 10,!;    /*tank with power 1 + tank with power 3 is out is out*/
+    Val is 100, CodeCombination is 13,!;    /*tank with power 2 + tank with power 3 is outis out*/
+    Val is 120, CodeCombination is 14,!;    /*all tanks is out*/
+    Val is 0).                              /*no tank out*/
 
 
 humen-life-combination([[_,_,Life,_,Power]|HTanks],CodeCombination):-
@@ -263,14 +262,6 @@ tanks_life_sum([[X,Y,Life,_,_]|Tanks],Sum):-
     Sum is Sum1 + Life.
 
 tanks_life_sum([],0).
-
-manhattan_distance([X1,Y1],[X2,Y2],RES):-
-    X is X1 - X2,
-    Y is Y1 - Y2,
-   abs(X,PX),abs(Y,PY),
-    RES is PX + PY.
-
-
 
 
 /*-------------------  evaluation function  --------------------*/
