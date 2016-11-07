@@ -26,7 +26,9 @@ public class GameController {
     public void turnHanlder(int turn) {
         if (turn == TankConst.COMPUTER) {
             setActivePlayer(TankConst.COMPUTER);
-            computer.play();
+            if(!GameStatus.gameFinished){
+                computer.play();
+            }
         } else {
             setActivePlayer(TankConst.HUMEN);
         }

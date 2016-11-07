@@ -5,16 +5,16 @@ tank_move_length(Length):-
     Length is 50.
 
 alpha_beta_depth(Depth):-        /* define the depth of the alpha beta tree*/
-    Depth is 4.
+    Depth is 6.
 
 /* ------------ const values  --------------- */
 
 
-moves([_,_,_, AlphaBetaDepth,_,_,_], _):-
+moves([_,_,_, AlphaBetaDepth,_,_], _):-
     alpha_beta_depth(Depth),
     AlphaBetaDepth == Depth,!,fail.
 
-moves([CTanks, HTanks, PLAYER, AlphaBetaDepth,_,_,_], PosList):-
+moves([CTanks, HTanks, PLAYER, AlphaBetaDepth,_,_], PosList):-
     AlphaBetaDepth2 is AlphaBetaDepth + 1,
     (
        PLAYER = computer, next_moves(CTanks, [CTanks, HTanks, PLAYER, AlphaBetaDepth2], PosList),!; 
@@ -23,7 +23,7 @@ moves([CTanks, HTanks, PLAYER, AlphaBetaDepth,_,_,_], PosList):-
 
 
 next_moves([[X,Y,L,Num,Power]|Tanks], Pos, PosList):-
-    (tank_moves([X,Y,L,Num,Power], Pos,PosList1), L > 0,!; PosList1 = []),
+    (tank_moves([X,Y,L,Num,Power], Pos,PosList1),!; PosList1 = []),
     next_moves(Tanks,Pos, PosList2),
     append(PosList1, PosList2, PosList).
 
@@ -89,7 +89,7 @@ add_to_pos_list(_, _, _, PosList,PosList).
     (Positions1 = [], 
      append(TempTanks, [[X1,Y1,CL1,Num,Power]], HeadCTanks),
      append(HeadCTanks, RestCTanks, CTanks),
-     Positions = [[CTanks, HTanks, humen, AlphaBetaDepth,-1,-1,-1]]
+     Positions = [[CTanks, HTanks, humen, AlphaBetaDepth,[X1,Y1,CL1,Num,Power],[-1,-1,-1,-1,0]]]
      ;
      Positions = Positions1).
 
@@ -100,7 +100,7 @@ add_to_pos_list(_, _, _, PosList,PosList).
     (Positions1 = [], 
      append(TempTanks, [[X1,Y1,CL1,Num,Power]], HeadHTanks),
      append(HeadHTanks, RestHTanks, HTanks),
-     Positions = [[CTanks, HTanks, humen, AlphaBetaDepth,-1,-1,-1]]
+     Positions = [[CTanks, HTanks, humen, AlphaBetaDepth,[-1,-1,-1,-1,0],[X1,Y1,CL1,Num,Power]]]
      ;
      Positions = Positions1).
 
@@ -108,11 +108,12 @@ add_to_pos_list(_, _, _, PosList,PosList).
 shooting_handler([X,Y,L,Num,Power], TempTanks, RestCTanks , [[X1,Y1,Life1,Num1,Power1]|HTanks], AlphaBetaDepth, PLAYER, AllHTanks,Result):-
     PLAYER = computer,!,
     (  (abs(X - X1,R1),abs(Y - Y1,R2), Life1 > 0,
-       R1 =< 50, R2 =< 50, L1 is (Life1 - Power), XS is X1, YS is Y1, Hit is Power,
+       R1 =< 50, R2 =< 50, 
+       L1 is (Life1 - Power),
        build_new_tanks([X1,Y1,L1,Num1,Power1],AllHTanks,NewHTanks),
        append(TempTanks, [[X,Y,L,Num,Power]], HeadCTanks),
        append(HeadCTanks, RestCTanks, CTanks),
-       Positions1 = [CTanks,NewHTanks,computer,AlphaBetaDepth,XS,YS,Hit]),
+       Positions1 = [CTanks,NewHTanks,humen,AlphaBetaDepth,[X,Y,L,Num,Power],[X1,Y1,L1,Num1,Power1]]),
        Result = [Positions1|Positions],!
        ;
        Result = Positions
@@ -124,12 +125,12 @@ shooting_handler([X,Y,L,Num,Power], TempTanks, RestCTanks , [[X1,Y1,Life1,Num1,P
 shooting_handler([X,Y,L,Num,Power], TempTanks, RestHTanks , [[X1,Y1,Life1,Num1,Power1]|CTanks], AlphaBetaDepth, PLAYER, AllCTanks,Result):-
     PLAYER = humen,!,
     (  (abs(X - X1,R1),abs(Y - Y1,R2), Life1 > 0,
-       R1 =< 50, R2 =< 50, L is (Life1 - Power), XS is X1, YS is Y1, Hit is Power,
+       R1 =< 50, R2 =< 50,
        L1 is (Life1-Power), 
        build_new_tanks([X1,Y1,L1,Num1,Power1],AllCTanks,NewCTanks),
        append(TempTanks, [[X,Y,L,Num,Power]], HeadHTanks),
        append(HeadHTanks, RestHTanks, HTanks),
-       Positions1 = [NewCTanks,HTanks,computer,AlphaBetaDepth,XS,YS,Hit]),
+       Positions1 = [NewCTanks,HTanks,computer,AlphaBetaDepth,[X1,Y1,L1,Num1,Power1],[X,Y,L,Num,Power]]),
        Result = [Positions1|Positions],!
        ;
        Result = Positions
@@ -215,9 +216,9 @@ betterof(Pos, Val, Pos1, Val1, Pos, Val):-
 betterof(_,_,Pos1,Val1,Pos1,Val1).
 
 
-min_to_move([_,_,PLAYER,_,_,_,_]):-
+min_to_move([_,_,PLAYER,_,_,_]):-
     PLAYER = humen.
- max_to_move([_,_,PLAYER,_,_,_,_]):-
+ max_to_move([_,_,PLAYER,_,_,_]):-
     PLAYER = computer.
 
 /* ------------------ alpha beta algorithm ------------------*/
@@ -228,7 +229,7 @@ min_to_move([_,_,PLAYER,_,_,_,_]):-
 
 /*-------------------  evaluation function  --------------------*/
 
-staticval([CTanks, HTanks,_,_,_,_,Hit],Val):-
+staticval([CTanks, HTanks,_,_,ActiveCTank,HTank1],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
      Val is (CSum-HSum)*2.

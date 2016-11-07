@@ -109,8 +109,8 @@ public class GameStatus {
 
         }
 
-        if (isHumenLost || isComputerLost && gameFinished) {
-            int tankId = isHumenLost ? TankConst.COMPUTER : TankConst.COMPUTER;
+        if (isHumenLost || isComputerLost && !gameFinished) {
+            int tankId = isHumenLost ? TankConst.COMPUTER : TankConst.HUMEN;
             showHowWon(tankId);
             gameFinished = true;
         }
