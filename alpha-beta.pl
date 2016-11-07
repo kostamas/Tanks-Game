@@ -107,7 +107,7 @@ add_to_pos_list(_, _, _, PosList,PosList).
 
 shooting_handler([X,Y,L,Num,Power], TempTanks, RestCTanks , [[X1,Y1,Life1,Num1,Power1]|HTanks], AlphaBetaDepth, PLAYER, AllHTanks,Result):-
     PLAYER = computer,!,
-    (  (abs(X - X1,R1),abs(Y - Y1,R2), Life1 > 0,
+    (  (abs(X - X1,R1),abs(Y - Y1,R2), Life1 > 0,L > 0,
        R1 =< 50, R2 =< 50, 
        L1 is (Life1 - Power),
        build_new_tanks([X1,Y1,L1,Num1,Power1],AllHTanks,NewHTanks),
@@ -124,7 +124,7 @@ shooting_handler([X,Y,L,Num,Power], TempTanks, RestCTanks , [[X1,Y1,Life1,Num1,P
 
 shooting_handler([X,Y,L,Num,Power], TempTanks, RestHTanks , [[X1,Y1,Life1,Num1,Power1]|CTanks], AlphaBetaDepth, PLAYER, AllCTanks,Result):-
     PLAYER = humen,!,
-    (  (abs(X - X1,R1),abs(Y - Y1,R2), Life1 > 0,
+    (  (abs(X - X1,R1),abs(Y - Y1,R2), Life1 > 0, L > 0,
        R1 =< 50, R2 =< 50,
        L1 is (Life1-Power), 
        build_new_tanks([X1,Y1,L1,Num1,Power1],AllCTanks,NewCTanks),
@@ -232,10 +232,31 @@ min_to_move([_,_,PLAYER,_,_,_]):-
 staticval([CTanks, HTanks,_,_,ActiveCTank,HTank1],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
-     Val is (CSum-HSum)*2.
+     humen-life-eval(HTanks,Val1),
+     Val2 is CSum-HSum,
+     Val is Val1 + Val2.
+     
      
 
+humen-life-eval(HTanks,Val):-
+    humen-life-combination(HTanks, CodeCombination),
+    Val is 10, CodeCombination is 1,!;     /*tank with power 1 is out*/
+    Val is 20, CodeCombination is 4,!;     /*tank with power 2 is out*/
+    Val is 30, CodeCombination is 9,!;     /*tank with power 3 is out*/
+    Val is 40, CodeCombination is 5,!;      /*tank with power 1 + tank with power 2 is out*/
+    Val is 50, CodeCombination is 10,!;    /*tank with power 1 + tank with power 3 is out is out*/
+    Val is 60, CodeCombination is 13,!;    /*tank with power 2 + tank with power 3 is outis out*/
+    Val is 70, CodeCombination is 14,!;    /*all tanks is out*/
+    Val is 0.                              /*no tank out*/
 
+
+
+humen-life-combination([[_,_,Life,_,Power]|HTanks],CodeCombination):-
+    humen-life-combination(HTanks,CodeCombination1),
+    (Life > 0, Val is 0 ,! ; Val is (Power*Power)),
+    CodeCombination is CodeCombination1 + Val.
+    
+humen-life-combination([],0).
 
 tanks_life_sum([[X,Y,Life,_,_]|Tanks],Sum):-
     tanks_life_sum(Tanks,Sum1),
