@@ -130,4 +130,39 @@ public class GameStatus {
 
         root.getChildren().add(label);
     }
+
+    static void checkIfSomeoneWon() {
+        boolean someoneWon = true;
+        int cSumLife = 0, hSumeLife = 0;
+        for (int i = 0; i < GameStatus.computerTanks.length; i++) {
+            if (GameStatus.computerTanks[i].getLife() > 0) {
+                for (int j = 0; j < GameStatus.humenTanks.length; j++) {
+                    int cx = GameStatus.computerTanks[i].getCurrentPosition()[0];
+                    int hx = GameStatus.humenTanks[j].getCurrentPosition()[0];
+                    if (GameStatus.humenTanks[j].getLife() > 0 && cx + 50 >= hx) {
+                        someoneWon = false;
+                    }
+                }
+            }
+        }
+
+        if (someoneWon) {
+            GameStatus.gameFinished = true;
+            for (int i = 0; i < GameStatus.computerTanks.length; i++) {
+                cSumLife += GameStatus.computerTanks[i].getLife();
+            }
+
+            for (int j = 0; j < GameStatus.humenTanks.length; j++) {
+                hSumeLife += GameStatus.humenTanks[j].getLife();
+            }
+
+            if (cSumLife > hSumeLife) {
+                showHowWon(TankConst.COMPUTER);
+            } else {
+                showHowWon(TankConst.HUMEN);
+
+            }
+        }
+
+    }
 }

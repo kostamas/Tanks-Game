@@ -229,12 +229,12 @@ min_to_move([_,_,PLAYER,_,_,_]):-
 
 /*-------------------  evaluation function  --------------------*/
 
-staticval([CTanks, HTanks,_,_,ActiveCTank,HumenTankToShoot],Val):-
+staticval([CTanks, HTanks,_,_,[_,_,_,_,CPower],[_,_,_,_,HPower]],Val):-
      tanks_life_sum(CTanks,CSum),
      tanks_life_sum(HTanks,HSum),
      humen-life-eval(HTanks,Val1),
-     Val2 is (CSum-HSum)*2,
-     Val is Val1 + Val2.
+     Val2 is (CSum-HSum),
+     Val is (Val1 + Val2).
      
      
 
