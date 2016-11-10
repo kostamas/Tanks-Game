@@ -18,15 +18,18 @@ public class GameController {
     public static void setActivePlayer(int activePlayer) {
         ACTIVE_PLAYER = activePlayer;
     }
-    
-    public static int getActivePlayer(){
+
+    public static int getActivePlayer() {
         return ACTIVE_PLAYER;
     }
 
     public void turnHanlder(int turn) {
+        GameStatus.checkIfSomeoneWon();
         if (turn == TankConst.COMPUTER) {
             setActivePlayer(TankConst.COMPUTER);
-            computer.play();
+            if (!GameStatus.gameFinished) {
+                computer.play();
+            }
         } else {
             setActivePlayer(TankConst.HUMEN);
         }

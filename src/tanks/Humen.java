@@ -34,6 +34,10 @@ public class Humen {
         if (event.getCode() == KeyCode.DIGIT3) {
             activeTank = humenTanks[2];
         }
+        
+         if (event.getCode() == KeyCode.DIGIT4) {
+            activeTank = humenTanks[3];
+        }
 
         if (event.getCode() == KeyCode.RIGHT) {
             activeTank.turnRight();
@@ -47,10 +51,6 @@ public class Humen {
                 moveTank("tank1_", TankConst.tankMoveLength);
             }
         }
-        
-//        if (event.getCode() == KeyCode.DOWN) {  // no reveres.
-//            moveTank("tank1_", -TankConst.tankMoveLength);
-//        }
 
         if (event.getCode() == KeyCode.ENTER) {
             activeTank.setStartedPostion(activeTank.getCurrentPosition()[0], activeTank.getCurrentPosition()[1]);
@@ -58,6 +58,9 @@ public class Humen {
         }
 
         if (event.getCode() == KeyCode.SPACE) {
+            if (activeTank != null && activeTank.getLife() < 0) {
+                return;
+            }
             int direction = activeTank.getDirection();
             int x = activeTank.getCurrentPosition()[0] + TankConst.bulletOffsetByDirection[direction][0];
             int y = activeTank.getCurrentPosition()[1] + TankConst.bulletOffsetByDirection[direction][1];
@@ -70,7 +73,7 @@ public class Humen {
             if (direction != 2 && direction != 6) {
                 nextY += (direction == 0 || direction == 1 || direction == 7) ? -10 : 10;
             }
-            activeTank.shot(root, activeTank);
+            activeTank.shot(root, activeTank, activeTank.getPower());
         }
     }
 
@@ -89,8 +92,17 @@ public class Humen {
             y += (direction == 0 || direction == 1 || direction == 7) ? -tankMoveDiff : tankMoveDiff;
         }
 
+        for (int i = 0; i < GameStatus.computerTanks.length; i++) {
+            int cx = GameStatus.computerTanks[i].getCurrentPosition()[0];
+            int cy = GameStatus.computerTanks[i].getCurrentPosition()[1];
+
+            if (x == cx && y == cy && GameStatus.computerTanks[i].getLife() > 0) {
+                return;
+            }
+        }
+
         if (Math.abs(x - startedX) <= maxDistance && Math.abs(y - startedY) <= maxDistance) {
-            activeTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + ".png");
+            activeTank.move(x, y, "assets/" + tankName + GameStatus.directions[direction] + activeTank.getTankNumber() + ".png");
         }
     }
 

@@ -50,27 +50,28 @@ public class GameStatus {
         computerStatus = new Label("COMPUTER TANKS LIFE:" + computerTanksText);
 
         humenStatus.setTextFill(Color.web("#48ff24"));
-        humenStatus.setFont(new Font(15));
-        humenStatus.setTranslateX(-220);
-        humenStatus.setTranslateY(-225);
+        humenStatus.setFont(new Font(14));
+        humenStatus.setTranslateX(-215);
+        humenStatus.setTranslateY(-150);
 
         computerStatus.setTextFill(Color.web("#ffa114"));
-        computerStatus.setFont(new Font(15));
-        computerStatus.setTranslateX(190);
-        computerStatus.setTranslateY(-225);
+        computerStatus.setFont(new Font(14));
+        computerStatus.setTranslateX(180);
+        computerStatus.setTranslateY(-150);
 
         root.getChildren().add(computerStatus);
         root.getChildren().add(humenStatus);
     }
 
-    public static boolean checkIfTankeHit(int bulletXPosition, int bulletYPosition, int bulletLength, Tank shootingTank) {
+    public static boolean checkIfTankeHit(int bulletXPosition, int bulletYPosition, int bulletLength, Tank shootingTank, int power) {
+
         for (int i = 0; i < GameStatus.computerTanks.length; i++) {
             int tankXPosition = GameStatus.computerTanks[i].getCurrentPosition()[0];
             int tankYPosition = GameStatus.computerTanks[i].getCurrentPosition()[1];
             boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + TankConst.tankLength);
             boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + TankConst.tankLength);
-            if (XCollision && YCollision && GameStatus.computerTanks[i] != shootingTank) {
-                handleTankHit(GameStatus.computerTanks[i]);
+            if (XCollision && YCollision && GameStatus.computerTanks[i] != shootingTank && GameStatus.computerTanks[i].getLife() > 0) {
+                handleTankHit(GameStatus.computerTanks[i], power);
                 return true;
             }
         }
@@ -80,8 +81,8 @@ public class GameStatus {
             int tankYPosition = GameStatus.humenTanks[i].getCurrentPosition()[1];
             boolean XCollision = (bulletXPosition >= tankXPosition && bulletXPosition < tankXPosition + TankConst.tankLength);
             boolean YCollision = (bulletYPosition >= tankYPosition && bulletYPosition < tankYPosition + TankConst.tankLength);
-            if (XCollision && YCollision && GameStatus.humenTanks[i] != shootingTank) {
-                handleTankHit(GameStatus.humenTanks[i]);
+            if (XCollision && YCollision && GameStatus.humenTanks[i] != shootingTank && GameStatus.humenTanks[i].getLife() > 0) {
+                handleTankHit(GameStatus.humenTanks[i], power);
                 return true;
             }
         }
@@ -89,8 +90,8 @@ public class GameStatus {
         return false;
     }
 
-    public static void handleTankHit(Tank tank) {
-        tank.hitted();
+    public static void handleTankHit(Tank tank, int power) {
+        tank.hitted(power);
         updateText();
 
         boolean isComputerLost = true, isHumenLost = true;
@@ -108,8 +109,8 @@ public class GameStatus {
 
         }
 
-        if (isHumenLost || isComputerLost && gameFinished) {
-            int tankId = isHumenLost ? TankConst.COMPUTER : TankConst.COMPUTER;
+        if (isHumenLost || isComputerLost && !gameFinished) {
+            int tankId = isHumenLost ? TankConst.COMPUTER : TankConst.HUMEN;
             showHowWon(tankId);
             gameFinished = true;
         }
@@ -128,5 +129,40 @@ public class GameStatus {
         label.setTranslateY(0);
 
         root.getChildren().add(label);
+    }
+
+    static void checkIfSomeoneWon() {
+        boolean someoneWon = true;
+        int cSumLife = 0, hSumeLife = 0;
+        for (int i = 0; i < GameStatus.computerTanks.length; i++) {
+            if (GameStatus.computerTanks[i].getLife() > 0) {
+                for (int j = 0; j < GameStatus.humenTanks.length; j++) {
+                    int cx = GameStatus.computerTanks[i].getCurrentPosition()[0];
+                    int hx = GameStatus.humenTanks[j].getCurrentPosition()[0];
+                    if (GameStatus.humenTanks[j].getLife() > 0 && cx + 50 >= hx) {
+                        someoneWon = false;
+                    }
+                }
+            }
+        }
+
+        if (someoneWon) {
+            GameStatus.gameFinished = true;
+            for (int i = 0; i < GameStatus.computerTanks.length; i++) {
+                cSumLife += GameStatus.computerTanks[i].getLife();
+            }
+
+            for (int j = 0; j < GameStatus.humenTanks.length; j++) {
+                hSumeLife += GameStatus.humenTanks[j].getLife();
+            }
+
+            if (cSumLife > hSumeLife) {
+                showHowWon(TankConst.COMPUTER);
+            } else {
+                showHowWon(TankConst.HUMEN);
+
+            }
+        }
+
     }
 }
