@@ -21,6 +21,7 @@ public class Computer {
     Tank activeTank;
     Timeline timeline;
     StackPane root;
+    int alphabetaDepth;
 
     public Computer(Tank[] computerTanks, Tank[] humenTanks, StackPane root) {
         this.computerTanks = computerTanks;
@@ -30,6 +31,10 @@ public class Computer {
         query.hasSolution();
 
         this.root = root;
+    }
+
+    public void setAlphabetaDepth(int depth) {
+        this.alphabetaDepth = depth;
     }
 
     public void play() {
@@ -161,7 +166,7 @@ public class Computer {
             }
         }
 
-        String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer, 1,_,_]";
+        String alphabetaPos = "[[" + computerTanksPos + "],[" + humenTanksPos + "], computer," + this.alphabetaDepth + ",_,_]";
 
         String bestMoveQuery = "[CTanks,_,_,_,[NextCX,NextCY,_,NextCNum,_],[HXToShoot,HYToShoot,_,_,_]]";
         String alphabetaQuery = "alphabeta(" + alphabetaPos + ",-999999, 999999," + bestMoveQuery + ", Val).";
@@ -175,32 +180,14 @@ public class Computer {
         int bestMoveTankNum, shootX, shootY;
         String shoot;
         Term[] terms = solution.get("CTanks").toTermArray();
-        shootX = solution.get("HXToShoot").intValue();
-        shootY = solution.get("HYToShoot").intValue();
-        
+
         tankNum = solution.get("NextCNum").intValue();
         result[0] = solution.get("NextCX").intValue();
         result[1] = solution.get("NextCY").intValue();
-        this.activeTank = this.computerTanks[tankNum - 1];
-//        for (int i = 0; i < terms.length; i++) {
-//            int tmpX = terms[i].toTermArray()[0].intValue();
-//            int tmpY = terms[i].toTermArray()[1].intValue();
-//
-//            int tankNum = terms[i].toTermArray()[3].intValue();
-//            int currentTankX = this.computerTanks[tankNum - 1].getCurrentPosition()[0];
-//            int currentTanky = this.computerTanks[tankNum - 1].getCurrentPosition()[1];
-//
-//            if (tmpX != currentTankX || tmpY != currentTanky) {
-//
-//                result[0] = tmpX;
-//                result[1] = tmpY;
-//                this.activeTank = this.computerTanks[tankNum - 1];
-//                break;
-//            }
-//        }
+        result[2] = solution.get("HXToShoot").intValue();
+        result[3] = solution.get("HYToShoot").intValue();
 
-        result[2] = shootX;
-        result[3] = shootY;
+        this.activeTank = this.computerTanks[tankNum - 1];
 
         return result;
     }
@@ -303,8 +290,6 @@ public class Computer {
                     isShooted = true;
                 }
             }
-
         }
     }
-
 }

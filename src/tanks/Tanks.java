@@ -22,6 +22,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Tanks extends Application implements EventHandler<KeyEvent> {
@@ -39,21 +40,37 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
 
     public void start(Stage primaryStage) throws Exception {
         root = new StackPane();
-
+        StackPane buttonWrapper = new StackPane();
         BackgroundImage myBI = new BackgroundImage(new Image("assets/background.png", 1300, 630, false, true),
                 BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
         root.setBackground(new Background(myBI));
 
+        Button button1 = new Button("HARD");
+        Button button2 = new Button("EASY");
+
+        button1.setMinHeight(60);
+        button1.setMinSize(100, 50);
+        button2.setMinSize(100, 50);
+        button1.setTranslateY(50);
+        button2.setTranslateY(-50);
+        button1.setFont(new Font(20));
+        button2.setFont(new Font(20));
+
+        button1.setTranslateY(50);
+
+        buttonWrapper.getChildren().add(button1);
+        buttonWrapper.getChildren().add(button2);
+
         Tank[] humenTanks = new Tank[3];
-        humenTanks[0] = new Tank(300, 100, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
-        humenTanks[1] = new Tank(300, 150, 3, 2, 2, "assets/tank1_down_right2.png", "assets/tank1_", root);
-        humenTanks[2] = new Tank(300, 200, 3, 3, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
+        humenTanks[0] = new Tank(250, 100, 3, 1, 1, "assets/tank1_down_right1.png", "assets/tank1_", root);
+        humenTanks[1] = new Tank(250, 150, 3, 2, 2, "assets/tank1_down_right2.png", "assets/tank1_", root);
+        humenTanks[2] = new Tank(250, 200, 3, 3, 3, "assets/tank1_down_right3.png", "assets/tank1_", root);
 
         Tank[] computerTanks = new Tank[3];
-        computerTanks[0] = new Tank(550, 100, 7, 3, 3, "assets/tank2_left3.png", "assets/tank2_", root);
-        computerTanks[1] = new Tank(550, 150, 7, 2, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
-        computerTanks[2] = new Tank(550, 200, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
+        computerTanks[0] = new Tank(500, 100, 7, 3, 3, "assets/tank2_left3.png", "assets/tank2_", root);
+        computerTanks[1] = new Tank(500, 150, 7, 2, 2, "assets/tank2_up_left2.png", "assets/tank2_", root);
+        computerTanks[2] = new Tank(500, 200, 7, 1, 1, "assets/tank2_up_left1.png", "assets/tank2_", root);
 
         root.getChildren().add(computerTanks[0]);
         root.getChildren().add(computerTanks[1]);
@@ -82,7 +99,23 @@ public class Tanks extends Application implements EventHandler<KeyEvent> {
         gameController = new GameController(scene, computer);
         humen = new Humen(humenTanks[0], humenTanks, root, gameController);
 
-        gameController.turnHanlder(TankConst.HUMEN);
+        root.getChildren().add(buttonWrapper);
+
+        button1.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                computer.setAlphabetaDepth(1);
+                root.getChildren().remove(buttonWrapper);
+                gameController.turnHanlder(TankConst.HUMEN);
+            }
+        });
+        button2.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                computer.setAlphabetaDepth(4);
+                root.getChildren().remove(buttonWrapper);
+                gameController.turnHanlder(TankConst.HUMEN);
+            }
+        });
+
     }
 
     @Override
